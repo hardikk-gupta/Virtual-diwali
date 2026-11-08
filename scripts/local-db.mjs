@@ -1,0 +1,2 @@
+import{DatabaseSync}from'node:sqlite';import{readFileSync}from'node:fs';
+export function localDB(){const db=new DatabaseSync(':memory:');db.exec(readFileSync(new URL('../drizzle/0000_lanterns.sql',import.meta.url),'utf8'));return{prepare(sql){const statement=db.prepare(sql);let args=[];const query={bind(...values){args=values;return query},async all(){return{results:statement.all(...args)}},async first(){return statement.get(...args)||null},async run(){return statement.run(...args)}};return query}}}

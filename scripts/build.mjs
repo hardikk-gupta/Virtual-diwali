@@ -1,0 +1,54 @@
+import { readFileSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
+rmSync('dist', { recursive: true, force: true });
+mkdirSync('dist/server', { recursive: true });
+mkdirSync('dist/.openai', { recursive: true });
+const html = readFileSync('web/index.html', 'utf8');
+const css = readFileSync('web/style.css', 'utf8');
+const js = readFileSync('web/app.js', 'utf8');
+const page = html.replace(/\{\{icon:([a-z0-9-]+)\}\}/g, (_, name) =>
+  readFileSync('assets/lucide/' + name + '.svg', 'utf8').replace('<svg', '<svg class="icon" aria-hidden="true"')
+).replace('/*SITE_CSS*/', css).replace('/*SITE_JS*/', js);
+const assets = {};
+for (const name of ['terrace.webp', 'rocket.webp', 'lantern.webp', 'outfit.ttf', 'work-sans.ttf', 'diwali-preview-2026.jpg', 'diwali-instrumental.mp3']) {
+  assets['/assets/' + name] = readFileSync('assets/' + name).toString('base64');
+}
+assets['/assets/diwali-share.jpg'] = assets['/assets/diwali-preview-2026.jpg'];
+const api = readFileSync('worker/api.js', 'utf8').replace('export async function api', 'async function api');
+const out = api + '\nconst PAGE=' + JSON.stringify(page) + ';\nconst ASSETS=' + JSON.stringify(assets) + `;
+export default {
+  async fetch(request, env) {
+    const path = new URL(request.url).pathname;
+    if (path.startsWith('/api/')) return api(request, env);
+    if (request.method !== 'GET' && request.method !== 'HEAD') {
+      return new Response('Method not allowed', { status: 405, headers: { Allow: 'GET, HEAD' } });
+    }
+    const head = request.method === 'HEAD';
+    if (path === '/robots.txt') {
+      return new Response(head ? null : 'User-agent: *\\nAllow: /\\n', {
+        headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'public, max-age=3600' }
+      });
+    }
+    if (ASSETS[path]) {
+      const bytes = Uint8Array.from(atob(ASSETS[path]), c => c.charCodeAt(0));
+      return new Response(head ? null : bytes, { headers: {
+        'Content-Type': path.endsWith('.mp3') ? 'audio/mpeg' : path.endsWith('.ttf') ? 'font/ttf' : path.endsWith('.jpg') ? 'image/jpeg' : 'image/webp',
+        'Content-Length': String(bytes.byteLength),
+        'Cache-Control': 'public, max-age=86400',
+        'X-Content-Type-Options': 'nosniff'
+      } });
+    }
+    if (!['/', '/index.html', '/diwali', '/diwali/'].includes(path)) {
+      return new Response(head ? null : 'Not found', { status: 404 });
+    }
+    return new Response(head ? null : PAGE, { headers: {
+      'Content-Type': 'text/html; charset=utf-8',
+      'Cache-Control': 'no-cache',
+      'X-Content-Type-Options': 'nosniff',
+      'Referrer-Policy': 'strict-origin-when-cross-origin',
+      'Content-Security-Policy': "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'"
+    } });
+  }
+};`;
+writeFileSync('dist/server/index.js', out);
+writeFileSync('dist/.openai/hosting.json', readFileSync('.openai/hosting.json'));
+console.log('Built worker with ' + Object.keys(assets).length + ' visual assets.');
