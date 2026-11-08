@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
 rmSync('dist', { recursive: true, force: true });
+mkdirSync('public/assets', { recursive: true });
 mkdirSync('dist/server', { recursive: true });
 mkdirSync('dist/.openai', { recursive: true });
 const html = readFileSync('web/index.html', 'utf8');
@@ -52,3 +53,9 @@ export default {
 writeFileSync('dist/server/index.js', out);
 writeFileSync('dist/.openai/hosting.json', readFileSync('.openai/hosting.json'));
 console.log('Built worker with ' + Object.keys(assets).length + ' visual assets.');
+
+
+// Vercel serves the same page and assets; Sites retains its Worker bundle.
+writeFileSync('public/index.html', page);
+writeFileSync('public/robots.txt', 'User-agent: *\nAllow: /\n');
+for (const [url, data] of Object.entries(assets)) writeFileSync('public' + url, Buffer.from(data, 'base64'));

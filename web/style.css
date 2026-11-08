@@ -216,7 +216,11 @@ body.editing-name #sky-count{display:none!important}
 @media(prefers-reduced-motion:reduce){.lantern{animation:none!important;transform:translate(var(--start-x),var(--start-y)) translate(-50%,-50%) scale(.65);opacity:.65}}
 /* Pull the rooftop back as a single scene; keep lanterns above its skyline. */
 #camera{transform:scale(1.12);transform-origin:50% 95%;transition:transform 4s cubic-bezier(.2,.65,.3,1)}
-body.zoomed #camera,body.formed #camera{transform:translateY(17vh) scale(1,.88);opacity:1}
+body.zoomed #camera,body.formed #camera{transform:translateY(26vh) scale(.94);opacity:1}
 body.formed #terrace{height:82vh;bottom:-14vh;mask-image:linear-gradient(to bottom,transparent 0%,#000 25%);-webkit-mask-image:linear-gradient(to bottom,transparent 0%,#000 25%);filter:saturate(.88)}
-#lanterns{clip-path:inset(0 0 39% 0)}
+#lanterns{clip-path:inset(0 0 16% 0);mask-image:none;-webkit-mask-image:none}
 @media(max-width:600px){body.formed #terrace{height:80vh;bottom:-15vh;background-position:center bottom;background-size:auto 100%}}
+
+/* Uninterrupted night sky behind the rooftop and emerging wishes. */
+.sky{background:#1c2d50}
+.vignette{background:none}

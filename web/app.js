@@ -71,9 +71,9 @@ function positionLantern(el,seed,index,mine=false){
  const columns=innerWidth<600?4:7,rows=28/columns,slot=(index*11)%28;
  const random=n=>((Math.imul(seed^(n*374761393),668265263)>>>0)%1000)/1000;
  const x=((slot%columns)+.12+random(1)*.76)/columns*innerWidth;
- const y=(Math.floor(slot/columns)+.12+random(2)*.76)/rows*innerHeight*.50;
+ const y=innerHeight*(.76+random(2)*.035);
  const compact=innerWidth<600,size=mine?(compact?78:112):(compact?36:54)+random(6)*(compact?28:52),duration=42+random(7)*28;
- const driftX=(random(3)-.5)*70,driftY=-(25+random(4)*65);
+ const driftX=(random(3)-.5)*70,driftY=-innerHeight*(.66+random(4)*.10);
  el.dataset.skySlot=String(index);
  el.style.cssText=`--start-x:${x}px;--start-y:${y}px;--drift-x:${driftX}px;--drift-y:${driftY}px;--size:${size}px;--duration:${duration}s;--delay:${mine?0:-random(8)*duration}s;--rotation:${-5+random(9)*10}deg`;
 }
@@ -158,3 +158,4 @@ updateKeyboardLayout();
 Promise.all([document.fonts.load('800 80px Outfit'),document.fonts.load('400 16px "Work Sans"'),rocketImage.decode().catch(()=>{}),new Promise(resolve=>{const image=new Image();image.onload=resolve;image.onerror=resolve;image.src='/assets/terrace.webp'})]).then(()=>{$('#loading').hidden=true;intro()});
 
 addEventListener('scroll',()=>{if(!titleRect)return;const next=$('#particle-title').getBoundingClientRect(),dx=next.left-titleRect.left,dy=next.top-titleRect.top;for(const point of titlePoints){point.tx+=dx;point.ty+=dy}titleRect=next;if(reduced&&introDone){clearFrame();renderTitle(4,performance.now())}},{passive:true});
+
