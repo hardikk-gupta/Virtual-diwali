@@ -70,12 +70,14 @@ function hash(str){let n=0;for(const c of str)n=(n*31+c.charCodeAt(0))>>>0;retur
 function positionLantern(el,seed,index,mine=false){
  const columns=innerWidth<600?4:7,rows=28/columns,slot=(index*11)%28;
  const random=n=>((Math.imul(seed^(n*374761393),668265263)>>>0)%1000)/1000;
- const x=((slot%columns)+.12+random(1)*.76)/columns*innerWidth;
- const y=innerHeight*(.76+random(2)*.035);
- const compact=innerWidth<600,size=mine?(compact?78:112):(compact?36:54)+random(6)*(compact?28:52),duration=42+random(7)*28;
- const driftX=(random(3)-.5)*70,driftY=-innerHeight*(.66+random(4)*.10);
+ const compact=innerWidth<600,size=mine?(compact?58:84):(compact?30:42)+random(6)*(compact?16:26),duration=110+random(7)*40;
+ const margin=Math.min(innerWidth*.18,110),x=margin+((slot%columns)+.2+random(1)*.6)/columns*(innerWidth-2*margin);
+ const y=innerHeight*.625-size*.85;
+ const endX=x+(innerWidth*.5-x)*.12,endY=-size;
+ const age=(Math.floor(slot/columns)+.15+random(8)*.7)/rows;
  el.dataset.skySlot=String(index);
- el.style.cssText=`--start-x:${x}px;--start-y:${y}px;--drift-x:${driftX}px;--drift-y:${driftY}px;--end-x:${innerWidth*(.30+random(3)*.46)}px;--end-y:${innerHeight*.04}px;--size:${size}px;--duration:${duration}s;--delay:${mine?0:-random(8)*duration}s;--rotation:${-5+random(9)*10}deg`;
+ el.style.cssText=`--start-x:${x}px;--start-y:${y}px;--end-x:${endX}px;--end-y:${endY}px;--size:${size}px;--duration:${duration}s;--delay:${mine?0:-age*duration}s;--rotation:${-3+random(9)*6}deg`;
+
 }
 function addLantern(record,mine=false){
  if(visibleIds.has(record.id))return;

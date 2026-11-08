@@ -229,4 +229,4 @@ body.formed #terrace{height:82vh;bottom:-14vh;mask-image:linear-gradient(to bott
 #terrace,body.formed #terrace{left:-30%;width:160%;background-size:cover;background-position:center bottom;clip-path:inset(0 10%)}
 #lanterns{clip-path:none;overflow:visible;mask-image:none;-webkit-mask-image:none;perspective:none}
 .lantern .tag{left:50%;right:auto;width:max-content;min-width:86%;max-width:none;overflow:visible;text-overflow:clip;padding:2px 8px;transform:translateX(-50%) rotate(-4deg)}
-@keyframes skyDrift{0%{transform:translate(var(--start-x),var(--start-y)) translate(-50%,-50%) rotate(var(--rotation)) scale(1);opacity:0}8%{opacity:.9}90%{opacity:.8}100%{transform:translate(var(--end-x),var(--end-y)) translate(-50%,-50%) rotate(2deg) scale(.22);opacity:0}}
+@keyframes skyDrift{0%{transform:translate(var(--start-x),var(--start-y)) translate(-50%,-50%) rotate(var(--rotation)) scale(1);opacity:0}8%{opacity:.9}90%{opacity:.8}100%{transform:translate(var(--end-x),var(--end-y)) translate(-50%,-50%) rotate(2deg) scale(.65);opacity:0}}
