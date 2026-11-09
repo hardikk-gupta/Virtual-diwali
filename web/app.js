@@ -84,13 +84,15 @@ const normalName=name=>name.normalize('NFC').trim().toLocaleLowerCase();
 const smooth=x=>x<=0?0:x>=1?1:x*x*(3-2*x);
 function geometry(){
  const w=innerWidth,h=innerHeight,roof=Math.max(h,w*.9),wall=h*.94;
- return{w,h,vpx:w/2,vpy:-.06*h,skyline:wall-(.522-.3)*roof};
+ return{w,h,wall,vpx:w/2,vpy:-.06*h,skyline:wall-(.522-.3)*roof};
 }
 function maxActive(){return innerWidth<600?7:innerWidth<1024?12:16}
 function depth(L,t){const age=t-L.born;if(age<=0)return 1;return 1+L.rate*(age-L.ease*(1-Math.exp(-age/L.ease)))}
 function pose(L,t,g){
  const z=depth(L,t),k=1/z,age=Math.max(0,t-L.born);
- const vx=g.vpx+L.drift*g.w,x=vx+(L.x0*g.w-vx)*k+Math.sin(age*.21+L.phase)*5*k,y=g.vpy+(L.y0*g.h-g.vpy)*k;
+ // Released from a rooftop: the lantern first lifts clear of the houses (rise), while it recedes.
+ const lift=L.rise*g.h*(1-Math.exp(-age/L.riseT));
+ const vx=g.vpx+L.drift*g.w,x=vx+(L.x0*g.w-vx)*k+Math.sin(age*.21+L.phase)*5*k,y=g.vpy+(L.y0*g.h-lift-g.vpy)*k;
  return{x,y,k,rot:Math.sin(age*.27+L.phase)*2.4};
 }
 function box(L,p,pad=10){
@@ -104,7 +106,7 @@ const FAR=.4,FADING=.48,distanceFade=k=>smooth((k-FAR)/(FADING-FAR));
 const gone=(L,p)=>p.k<FAR||box(L,p,0).b<-4;
 function blocked(){
  const out=[];
- for(const sel of ['#greeting','#release-panel','.footer-bar','.controls','#intro-copy']){
+ for(const sel of ['.controls','#intro-copy']){
   const el=$(sel);if(!el||el.hidden||el.closest('[hidden]'))continue;
   const r=el.getBoundingClientRect();if(r.width&&r.height)out.push({l:r.left-12,r:r.right+12,t:r.top-12,b:r.bottom+12});
  }
@@ -122,22 +124,26 @@ function collidesInFlight(C,others,t,g){
 }
 function makeLantern(record,opts={}){
  const compact=innerWidth<600,tablet=innerWidth<1024,mine=!!opts.mine||record.id===myId;
- const s0=opts.size||(compact?44+Math.random()*16:tablet?54+Math.random()*20:62+Math.random()*28);
+ const s0=opts.size||(compact?40+Math.random()*14:tablet?50+Math.random()*18:56+Math.random()*24);
  const fs=mine&&opts.size?Math.max(13,s0*.13):Math.max(11,Math.min(13,s0*.16));
  return{id:record.id,name:record.name,key:normalName(record.name),mine,s0,fs,labelW:record.name.length*fs*.62+fs*1.4,
-  x0:.5,y0:.5,born:sky.time,rate:opts.rate||(.022+Math.random()*.008),ease:opts.ease||6,phase:Math.random()*6.28,drift:opts.mine?0:(Math.random()-.5)*.36,el:null,dying:0};
+  x0:.5,y0:.5,born:sky.time,rate:opts.rate||(.022+Math.random()*.008),ease:opts.ease||6,phase:Math.random()*6.28,drift:opts.mine?0:(Math.random()-.5)*.36,rise:opts.mine?0:.16+Math.random()*.1,riseT:14,el:null,dying:0};
 }
+// Births sit on the roof edges of the houses across the street: anywhere along the skyline, the
+// lantern's paper tag resting on a roof line between the tallest roofs and the parapet's lights.
 function findBirth(L,g){
- const zones=blocked(),top=Math.max(64,$('.topbar').getBoundingClientRect().bottom+8),bottom=g.skyline-12;
- const others=[...sky.active.filter(a=>!a.dying),...(sky.mine?[sky.mine]:[])];let best=null,bestScore=-1;
+ const zones=blocked(),top=Math.max(64,$('.topbar').getBoundingClientRect().bottom+8);
+ const roofTop=g.skyline,roofLow=g.skyline+(g.wall-g.skyline)*.35;
+ // Lanterns still fading out count too, so a new one is never born on top of one leaving.
+ const others=[...sky.active,...(sky.mine?[sky.mine]:[])];let best=null,bestScore=-1;
  for(let tries=0;tries<48;tries++){
-  const w=L.s0,h=w*LANTERN_RATIO+L.fs*.9,half=Math.max(w,Math.min(L.labelW,w*2.2))/2;
-  const minX=half+8,maxX=g.w-half-8,minY=top+h/2,maxY=bottom-h/2;if(maxX<=minX||maxY<=minY)return null;
-  const x=minX+Math.random()*(maxX-minX),y=minY+(maxY-minY)*Math.sqrt(Math.random());
-  L.x0=x/g.w;L.y0=y/g.h;const p=pose(L,L.born,g),b=box(L,p,0);
-  if(zones.some(z=>hit(b,z)))continue;
+  const w=L.s0,h=w*LANTERN_RATIO,half=Math.max(w,Math.min(L.labelW,w*2.2))/2;
+  const minX=half+8,maxX=g.w-half-8;if(maxX<=minX)return null;
+  const x=minX+Math.random()*(maxX-minX),roof=roofTop+Math.random()*(roofLow-roofTop),y=roof-h/2-L.fs*.9;
+  L.x0=x/g.w;L.y0=y/g.h;const p=pose(L,sky.time,g),b=box(L,p,0);
+  if(b.t<top||zones.some(z=>hit(b,z)))continue;
   if(collidesInFlight(L,others,sky.time,g))continue;
-  let score=1e9;for(const o of others){const q=pose(o,sky.time,g);score=Math.min(score,Math.hypot(q.x-x,q.y-y))}
+  let score=1e9;for(const o of others){const q=pose(o,sky.time,g);score=Math.min(score,Math.hypot(q.x-p.x,q.y-p.y))}
   if(score>bestScore){bestScore=score;best={x0:L.x0,y0:L.y0}}
   if(tries>10&&best)break;
  }
@@ -151,13 +157,11 @@ function lanternElement(L){
  const tag=document.createElement('span');tag.className='lantern-name';tag.textContent=L.name;
  el.append(img,tag);return el;
 }
-let quiet=null;
-function quietZone(){const r=$('#greeting').getBoundingClientRect();return r.width?{l:r.left,r:r.right,t:r.top,b:r.bottom}:null}
 function render(L,g){
  const p=pose(L,sky.time,g),age=sky.time-L.born;
  let alpha=reduced?.9:smooth(age/4.5)*distanceFade(p.k);
  // Lanterns drifting behind the greeting soften so the words stay readable.
- if(quiet&&!L.mine){const b=box(L,p,0),w=Math.max(0,Math.min(b.r,quiet.r)-Math.max(b.l,quiet.l)),h=Math.max(0,Math.min(b.b,quiet.b)-Math.max(b.t,quiet.t));alpha*=1-.62*smooth(w*h/((b.r-b.l)*(b.b-b.t))*1.6)}
+ // Lanterns keep their full light everywhere, behind the words included.
  if(L.dying)alpha*=1-smooth((sky.time-L.dying)/1.6);
  L.el.style.opacity=alpha.toFixed(3);
  L.el.style.transform=`translate3d(${(p.x-L.s0/2).toFixed(1)}px,${(p.y-L.s0*LANTERN_RATIO/2).toFixed(1)}px,0) rotate(${p.rot.toFixed(2)}deg) scale(${p.k.toFixed(4)})`;
@@ -174,13 +178,14 @@ function nextRecord(){
 }
 function spawn(g){
  const record=nextRecord();if(!record)return false;
- const L=findBirth(makeLantern(record),g);if(!L)return false;
+ const fresh=makeLantern(record);if(reduced)fresh.born=sky.time-(18+Math.random()*30);
+ const L=findBirth(fresh,g);if(!L)return false;
  L.el=lanternElement(L);skyLayer.append(L.el);sky.active.push(L);sky.spawned++;render(L,g);return true;
 }
 function tick(now){
  sky.raf=requestAnimationFrame(tick);
  const dt=Math.min(.1,Math.max(0,(now-sky.last)/1000));sky.last=now;if(document.hidden)return;sky.time+=dt;
- const g=geometry();quiet=quietZone();
+ const g=geometry();
  for(const L of [...sky.active,...(sky.mine?[sky.mine]:[])]){
   const p=render(L,g);
   if(gone(L,p)||(L.dying&&sky.time-L.dying>1.7)){L.el.remove();if(L===sky.mine)sky.mine=null;else sky.active.splice(sky.active.indexOf(L),1)}
@@ -205,7 +210,7 @@ function stopSky(){
  sky.active=[];sky.mine=null;sky.spawned=0;
 }
 function layoutStill(){
- if(!sky.running)return;const g=geometry();quiet=quietZone();
+ if(!sky.running)return;const g=geometry();
  for(const L of sky.active)L.el.remove();sky.active=[];
  for(let i=0;i<maxActive()*2&&sky.active.length<maxActive();i++)spawn(g);
 }

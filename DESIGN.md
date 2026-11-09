@@ -72,11 +72,15 @@ There are no eyebrows, no tracked capitals and no italic or accented words in he
 
 1. **Top bar**, edge-aligned: the wordmark on the left; Skip intro, Replay and Sound on the right.
 2. **Open sky**: everything above the poster's foot belongs to the lanterns.
-3. **The poster's foot**, centred on one axis and anchored to the bottom: title → byline → name field
-   with the Launch lantern button → privacy note → a row with the count and "Pass on the light".
+3. **The poster's foot**, centred on one axis and lifted off the bottom edge by `--lift` (18svh on
+   desktop, 14svh under 60rem, 12svh on phones): title → byline → name field with the Launch
+   lantern button → privacy note → a row with the count and "Pass on the light". The block rests a
+   little above the screen's middle, which also puts the burst in open sky above the rooftops. The
+   title is capped at 15svh, so short laptop screens stay balanced.
    The byline, form and footer hold their space through the intro, so the title's position never
    changes.
 4. A paper scrim at 72% rises behind the foot so the words sit on the dark side of the photograph.
+   It darkens only the photograph: lanterns sit above it, at full brightness.
 
 Landscape phones hide the privacy note and tighten the gaps. With the keyboard open on a phone, the form
 moves into the visible space on a smoked well, and everything else steps aside.
@@ -94,12 +98,15 @@ moves into the visible space on a smoked well, and everything else steps aside.
   4. The sparks gather into the letters in place: the title never travels. Once it has formed, the
      byline, the form and the footer fade in 250ms apart, with opacity only and nothing sliding.
 - **Lanterns** (engine in `web/app.js`):
-  - The sky starts empty and lanterns are born one at a time, anywhere in open sky, never behind
-    text or controls.
-  - Each one recedes toward a vanishing point just past the top edge, with a slight drift of its
-    own.
-  - It fades out at about half its size.
-  - No two lanterns ever overlap and no name appears twice at once.
+  - The sky starts empty and lanterns are released one at a time from the roof edges of the houses
+    across the street: anywhere along the skyline, the paper tag resting on a roof line between the
+    tallest roofs and the parapet's lights.
+  - Each one lights up over 4.5s, lifts clear of the houses (16 to 26% of the screen height,
+    easing out over about 14s) and recedes toward a vanishing point just past the top edge, with a
+    slight drift of its own.
+  - Lanterns are never dimmed behind the words; they keep their full light the whole way. They slip
+    away only at the far end, fading out once they are about half their size.
+  - No two lanterns ever overlap, including one that is fading out, and no name appears twice at once.
   - At most 16 on desktop, 12 on tablet, 7 on phone.
   - Your lantern launches from the centre of the screen, above the interface, with an ember ring
     on its tag.
