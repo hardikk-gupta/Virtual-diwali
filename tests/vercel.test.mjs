@@ -8,7 +8,7 @@ test('Vercel output contains the rendered page and every referenced local asset'
   const html = readFileSync(config.outputDirectory + '/index.html', 'utf8');
   assert(!html.includes('/*SITE_JS*/'));
   assert(!html.includes('{{icon:'));
-  for (const [, asset] of html.matchAll(/(?:src=["']|url\(["']?)(\/assets\/[^"')]+)["')]/g)) {
+  for (const [, asset] of html.matchAll(/(?:src=["']|href=["']|url\(["']?)(\/(?:assets|resources)\/[^"')]+)["')]/g)) {
     assert(existsSync(config.outputDirectory + asset), asset);
   }
   assert(existsSync('dist/server/index.js'));

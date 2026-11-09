@@ -1,19 +1,26 @@
 import { readFileSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
 rmSync('dist', { recursive: true, force: true });
-mkdirSync('public/assets', { recursive: true });
+rmSync('public', { recursive: true, force: true });
+for (const dir of ['public/assets', 'public/resources/images', 'public/resources/fonts', 'public/resources/audio']) mkdirSync(dir, { recursive: true });
 mkdirSync('dist/server', { recursive: true });
 mkdirSync('dist/.openai', { recursive: true });
 const html = readFileSync('web/index.html', 'utf8');
 const css = readFileSync('web/style.css', 'utf8');
 const js = readFileSync('web/app.js', 'utf8');
 const page = html.replace(/\{\{icon:([a-z0-9-]+)\}\}/g, (_, name) =>
-  readFileSync('assets/lucide/' + name + '.svg', 'utf8').replace('<svg', '<svg class="icon" aria-hidden="true"')
+  readFileSync('resources/icons/' + name + '.svg', 'utf8').replace('<svg', '<svg class="icon" aria-hidden="true"')
 ).replace('/*SITE_CSS*/', css).replace('/*SITE_JS*/', js);
+// Everything the page loads lives in resources/ and is served at the same path.
+const served = [
+  'images/rooftop-sky.webp', 'images/rocket.webp', 'images/lantern.webp', 'images/diwali-share.jpg',
+  'fonts/outfit.woff2', 'fonts/manrope.woff2', 'fonts/playfair-display.woff2', 'fonts/playfair-display-italic.woff2',
+  'audio/diwali-instrumental.mp3'
+];
 const assets = {};
-for (const name of ['terrace.webp', 'rocket.webp', 'lantern.webp', 'outfit.ttf', 'work-sans.ttf', 'diwali-preview-2026.jpg', 'diwali-instrumental.mp3']) {
-  assets['/assets/' + name] = readFileSync('assets/' + name).toString('base64');
-}
-assets['/assets/diwali-share.jpg'] = assets['/assets/diwali-preview-2026.jpg'];
+for (const file of served) assets['/resources/' + file] = readFileSync('resources/' + file).toString('base64');
+// Stable public URLs already used by social previews and earlier shares.
+assets['/assets/diwali-share.jpg'] = assets['/resources/images/diwali-share.jpg'];
+assets['/assets/diwali-preview-2026.jpg'] = assets['/resources/images/diwali-share.jpg'];
 const api = readFileSync('worker/api.js', 'utf8').replace('export async function api', 'async function api');
 const out = api + '\nconst PAGE=' + JSON.stringify(page) + ';\nconst ASSETS=' + JSON.stringify(assets) + `;
 export default {
@@ -32,7 +39,7 @@ export default {
     if (ASSETS[path]) {
       const bytes = Uint8Array.from(atob(ASSETS[path]), c => c.charCodeAt(0));
       return new Response(head ? null : bytes, { headers: {
-        'Content-Type': path.endsWith('.mp3') ? 'audio/mpeg' : path.endsWith('.ttf') ? 'font/ttf' : path.endsWith('.jpg') ? 'image/jpeg' : 'image/webp',
+        'Content-Type': path.endsWith('.mp3') ? 'audio/mpeg' : path.endsWith('.woff2') ? 'font/woff2' : path.endsWith('.jpg') ? 'image/jpeg' : 'image/webp',
         'Content-Length': String(bytes.byteLength),
         'Cache-Control': 'public, max-age=86400',
         'X-Content-Type-Options': 'nosniff'
@@ -52,7 +59,7 @@ export default {
 };`;
 writeFileSync('dist/server/index.js', out);
 writeFileSync('dist/.openai/hosting.json', readFileSync('.openai/hosting.json'));
-console.log('Built worker with ' + Object.keys(assets).length + ' visual assets.');
+console.log('Built worker with ' + Object.keys(assets).length + ' assets.');
 
 
 // Vercel serves the same page and assets; Sites retains its Worker bundle.

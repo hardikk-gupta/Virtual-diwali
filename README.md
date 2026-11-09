@@ -4,7 +4,9 @@ A shared Diwali sky built with Sites. Visitors can launch named lanterns, watch 
 
 The live website is hosted separately from this repository. Its lantern records remain in the site's database and are not included here.
 
-Run `node scripts/build.mjs` to build the worker and `node --test tests/api.test.mjs` to run the API tests. The local preview uses sample data.
+Run `node scripts/build.mjs` to build the worker and `node --test tests/api.test.mjs` to run the API tests. `npm run dev` starts a local preview on port 3000 with 55 sample lanterns in an in-memory database.
+
+All images, fonts, audio and icons live in `resources/` (see `DESIGN.md` §7). The design system, typography and lantern motion are documented in `DESIGN.md`.
 
 
 ## Vercel

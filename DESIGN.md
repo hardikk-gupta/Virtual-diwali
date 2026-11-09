@@ -1,61 +1,152 @@
-# Diwali Sky design system
+# Diwali Sky — Design System
 
-Guidance: UI/UX Pro Max, https://github.com/nextlevelbuilder/ui-ux-pro-max-skill. Its generated recommendation supplied geometric sans typography, vibrant rose/blue direction and bottom CTA hierarchy. The generic light hero/features template is intentionally adapted to this user's immersive night-sky greeting; no unrelated feature sections are added.
+A single immersive greeting: a rocket is lit on an Indian rooftop, the camera tilts up into the
+night sky, "Happy Diwali" forms out of sparks, and visitors' lanterns rise and drift away. The
+interface is deliberately small: one greeting, one action card, one footer. Everything else is sky.
 
-## Palette and typography
-- Midnight indigo (#10112D / #1B1B47) creates depth and a consistent background for sparkles.
-- Magenta (#F08BD2) marks the primary Launch action and the celebratory lettering.
-- Pale lilac (#F7F0FF / #C7C9E3) keeps normal and secondary text readable. The secondary share action uses a subdued indigo surface and a lilac outline.
-- The terrace flames and red lanterns retain their natural colours; they are scene objects, not additional UI accents.
-- Outfit 800 is used for the large greeting: rounded geometric forms make it expressive without decorative-script legibility problems.
-- Work Sans 400–600 is used for labels, inputs and buttons, where small-size clarity matters most. Both variable fonts are served by the Site.
-- Contrast checks: Launch text/fill 7.55:1; primary text/input 15.19:1; secondary text/sky 9.96:1.
+Process reference: [UI UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill).
+Its recommendations for this brief ("festive, immersive, premium") were adopted where they fit:
+a serif heading paired with a clean sans body ("Classic Elegant" pairing), SVG icons instead of
+emoji, slow motion ("avoid fast animations"), visible focus states, reduced-motion support, and
+checks at 375 / 768 / 1024 / 1440 px. Its default suggestion of liquid glass was **not** used:
+the panels are solid surfaces so text never depends on what is behind it.
 
-## Proportion and behaviour
-- Type roles: 12px helper, 14px label, 16px input/button/body, 18–20px section heading, fitted responsive display lettering.
-- Spacing: 4/8/12/16/24/32px. Touch targets: 48px; Lucide icons: 20px with 2px strokes. Corners: 12px controls inside a 16px input group.
-- Canvas bitmap dimensions use device pixels; its display width and height are explicitly 100% in CSS. Word fitting and rocket coordinates use logical CSS pixels.
-- Rocket: three-second burning fuse; vertical flight; single continuous camera zoom. Sparkle streaks and cross-shaped glints replace the dotted LED grid.
-- Reveal order: sparkles form Happy Diwali, then Wishing you above and by Hardik below, then the launch form. The share action is a separate bottom button, clear of the viewport edge.
-- Lanterns appear within the sky and recede along Z rather than travelling out of the top. Existing names are shared through D1; removed records are removed from open clients on refresh.
-- Reduced-motion mode, visible field label, inline feedback, focus rings and safe-area clearance are retained.
+---
 
-## Verification
-- Visual QA uses 375×667 and 390×844 CSS-pixel embedded viewports, which independently run the real responsive page.
-- The QA wrapper is local development code and is not a published Site route. Production anti-framing policy remains unchanged.
+## 1. Colour
 
-## Glass and launch confirmation
-- Controls, input group, form panel and share action use a consistent translucent gradient, light upper edge, background blur and inset highlight. Primary Launch retains a stronger pink tint to preserve hierarchy.
-- Success replaces the form with a personalised glass card, lantern artwork, a brief highlight sweep and sparkle burst; errors remain inline and replay restores the form.
-- Final framing keeps the wall and neighbouring rooftops at the lower edge, with most of the viewport devoted to the sky. The camera no longer fades the whole architectural layer away.
-- Mobile success and input states were visually checked at 375×667 CSS pixels.
+The palette is unchanged from the original site: midnight indigo, magenta and lilac.
 
-## Share options
-- Pass on the light opens the system share sheet where supported. Unsupported or denied native sharing opens a glass dialog with WhatsApp, Telegram, Email and Copy link.
-- Cancelling native sharing does not copy anything. Copying is an explicit option with inline confirmation.
-- The dialog has a labelled heading, native modal focus handling, Escape/close/backdrop dismissal and consistent Lucide controls. Mobile fallback and copy feedback were checked at 375×667 CSS pixels.
+| Token | Value | Use |
+|---|---|---|
+| `--night-0` | `#091028` | Page background; the exact zenith colour of the extended sky photo |
+| `--night-1` | `#10112D` | Input fields, dialog background |
+| `--night-2` | `#1B1B47` | Share options |
+| `--night-3` | `#2A2B5C` | Hover state for dark controls |
+| `--surface` | `rgba(16,17,45,.94)` | Card, footer pill, icon buttons (solid, no blur) |
+| `--magenta` | `#F08BD2` | Primary action, eyebrows, focus ring |
+| `--magenta-strong` | `#FFAEE6` | Primary hover |
+| `--on-magenta` | `#30102C` | Text on the primary button |
+| `--lilac-0` | `#F7F0FF` | Primary text |
+| `--lilac-1` | `#C7C9E3` | Secondary text (body copy, byline) |
+| `--lilac-2` | `#9FA2C8` | Tertiary text (captions, placeholders) |
+| `--line` / `--line-strong` | lilac at 12% / 25% | Hairline borders |
+| `--danger` | `#FFB4C8` | Inline form errors |
 
-## Keyboard and frost refinement
-- Focus on the name field immediately hides and disables the bottom share control on mobile; it never moves above the keyboard. It returns after focus/keyboard dismissal.
-- VisualViewport resize and scroll events track the space above the keyboard. In the compact typing state, the form is centred within that visible space and the large greeting/controls are visually suppressed to prevent overlap. Submitting blurs the field before showing the success card.
-- Glass surfaces now use 44–48px background blur, a denser translucent tint and consistent inset edge lighting. Input focus highlights its containing field instead of drawing a separate large outline over adjacent controls.
-- Squircle corners use native CSS corner-shape with rounded-corner fallback; backdrop blur is retained without clip masks.
-- QA includes a 375×430 viewport to simulate available keyboard-height space; this is a layout check, not a physical Android keyboard test.
+Contrast on `--surface`: lilac-0 ≈ 16:1, lilac-1 ≈ 10:1, lilac-2 ≈ 6.5:1, on-magenta on magenta ≈ 7.5:1.
+The scene (rooftop flames, red lanterns) keeps its photographic colours; they are not UI accents.
 
-## Social preview
-- Open Graph and large-image Twitter metadata reference a public 1200×630 JPEG preview with explicit MIME type, dimensions and alt text. It is a site asset so external chat preview fetchers can access it without signing in.
-- The promotional artwork follows the same pink/indigo palette, lanterns and Indian rooftop setting.
+## 2. Typography
 
-Sharing preview follow-up: verified live HTML and JPEG return HTTP 200 with WhatsApp/Facebook crawler user agents. Added a fresh `/diwali` sharing route, canonical/OG URL and image URL to avoid the previously shared URL's cached card. Native share, app share links and copying use that route. Explicit robots permission and correct image HEAD/content length are supported. Local worker checks cover crawler metadata, JPEG bytes, HEAD and robots; actual messaging-app card generation remains outside site control.
+Three families, each with one job. All are self-hosted as Latin-subset WOFF2 files (the
+Content-Security-Policy allows `'self'` only). Names in Devanagari and other scripts fall back to
+the system font.
 
-## Shared lantern count
-A compact frosted squircle below the existing share button displays the API's complete database total, with Indian number grouping and singular/plural labels. It counts lantern releases rather than online presence. The button and existing greeting/form positions are unchanged. The badge shares the button's keyboard hiding and intro visibility, refreshes with the existing 15-second sky polling and after a release, and stays hidden during unavailable/invalid responses rather than showing a fabricated zero. Short desktop viewports place the badge beside the button to avoid the bottom edge.
+| Role | Family | Weight | Size (desktop / phone) | Where |
+|---|---|---|---|---|
+| Display | **Outfit** | 800 | fitted to the title box | "Happy Diwali" spark lettering (canvas) |
+| Heading | **Playfair Display** | 500–600 | intro 32–56px · card 26/32 · phone 21/26 | Intro line, card titles, dialog title |
+| Byline | **Playfair Display Italic** | 400 | 20/28 · phone 17/24 | "with love, Hardik" |
+| Eyebrow | **Manrope** | 700, uppercase, +0.22em | 12/16 · phone 11 | "Wishing you", "A light from …", "Share" |
+| Body | **Manrope** | 400 | 15/24 · phone 14/21 | Card descriptions |
+| Label | **Manrope** | 600 | 13/18 | Form label |
+| Input | **Manrope** | 500 | 16 (prevents iOS zoom) | Name field |
+| Button | **Manrope** | 700 | 15 primary · 14 secondary · 13 ghost | Launch, Share, Skip |
+| Caption | **Manrope** | 400 | 12/18 | Privacy note, copy feedback |
+| Counter | **Outfit** 700 + Manrope 500 | — | 18 + 12 | "55 lanterns in our sky" |
+| Lantern name | **Manrope** | 700 | 10–13, scales with the lantern | Paper tag on each lantern |
 
-## Laptop layout and full-sky lantern paths
-The laptop screenshot exposed a fixed-position collision between form, share action and counter. The page now uses a two-column grid at 1000px+: a left-aligned two-line greeting and a right action stack. Content height governs Launch, Share and the counter; they cannot overlap. Smaller screens use a single content stack, with a compact 375×667 layout that fits all controls and allows scrolling when necessary. Outfit/Work Sans and the existing indigo/pink palette remain.
+Rule of thumb: Outfit appears only where a number or the hero needs weight; Playfair is for
+headings and the byline; everything you interact with is Manrope.
 
-The launch panel uses a diffuse 48px backdrop, a denser indigo tint, restrained upper-edge reflection and squircle corners. Share avoids an opacity-animated ancestor so its backdrop can sample the scenery. Keyboard hiding and centred typing behaviour remain.
+## 3. Spacing, shape and controls
 
-Lanterns use a stratified 28-cell sky distribution with independent seeded paths toward left, right and top edges. Screen-space travel avoids the previous central vanishing-point cluster. Desktop shows up to 28; phones show up to 14 smaller lanterns. The greeting area softly dims scenery behind the text. Reduced motion uses static distributed positions. Existing records and API schema are unchanged; preview-only names are confined to the development server.
+- 4-pt spacing scale: `4 · 8 · 12 · 16 · 20 · 24 · 32 · 40 · 48 · 64`.
+- Page gutter: `clamp(16px, 4vw, 40px)` plus safe-area insets.
+- Radii: 10 (small), 14 (controls), 20 (card, dialog).
+- Controls: primary/input height 52px (48px on phones); icon buttons and secondary buttons 44px.
+- Icons: Lucide, 18px, 2px stroke, inlined at build time.
+- Card: width 460px (full width on phones), padding 32px (24px on short screens, 20px on phones),
+  1px hairline border, a 1px magenta highlight along the top edge, layered drop shadow.
 
-Validation: API tests passed. Visual checks at 1363×936 and embedded 375×667; measured phone control bottom 638px in a 667px viewport with no scrolling or overlap. Desktop exit distribution: 10 left, 9 right, 9 top in a 28-lantern fixture.
+## 4. Layout
+
+The page has four fixed regions, top to bottom:
+
+1. **Top bar**: brand line on the left ("A sky full of wishes", hidden on phones); Skip / Replay / Sound on the right.
+2. **Greeting**: eyebrow → display title → byline, centred.
+3. **Open sky**: a flexible gap where lanterns are born and travel. Nothing in the interface sits here.
+4. **Action**: the launch card, centred and anchored to the bottom, then the **footer**: lantern
+   counter + "Pass on the light". On screens ≥ 1024px the footer items sit in the bottom-left and
+   bottom-right corners; below that they form a row under the card.
+
+Special cases: landscape phones (height ≤ 500px) put the greeting on the left and the card on the
+right. On phones with the keyboard open, the card centres itself in the visible viewport and the
+greeting, top bar and footer step aside.
+
+## 5. The sky
+
+- `resources/images/rooftop-sky.webp` is the original rooftop photograph extended upward by
+  1,024px of its own sky (see `scripts/extend-sky.py`). Each column continues the photo's top
+  colour, eases to the zenith navy `#091028`, and carries the same grain, so there is no visible
+  seam and no synthetic gradient.
+- The scene is sized from `--roof = max(100svh, 90vw)`: the full photo covers the viewport during
+  the intro. On wide screens the 90vw width also crops the side building out of frame.
+- After the rocket launches, the camera tilts up over 4.6s until only the lit parapet remains at
+  94% of the viewport height. The sky is the photo itself; the only overlay is a top fade into the
+  same `#091028`, so the edge of the image is never visible on very tall screens.
+- Faint twinkling stars appear only in the upper half, after the greeting forms.
+
+## 6. Lantern motion
+
+Lanterns are drawn by a small engine in `web/app.js`, not by CSS keyframes.
+
+- **Empty start.** The sky is empty when the greeting forms. Lanterns are then born one at a
+  time, about every 2–3.5s, until the sky holds 16 (desktop), 12 (tablet) or 7 (phone). After
+  that a new one is born whenever one leaves.
+- **Born in the sky.** Birth points are anywhere across the full width, above the rooftop
+  skyline, below the top bar, and never behind the greeting, card or footer. A lantern fades and
+  ignites over 4.5s; its glow flickers continuously.
+- **Perspective, not paths.** Each lantern recedes in depth toward a vanishing point at
+  (centre, −0.8 × viewport height), above and outside the screen. Its screen position is
+  `VP + (birth − VP) / depth`, so it rises, drifts toward the centre and shrinks together, like
+  the lower part of a "V" whose point we never see. Depth accelerates gently from rest, so
+  nothing ever starts fast. Typical speed is 7–12px per second, and a crossing takes about 1–2
+  minutes.
+- **No overlaps.** Before a lantern is born, its whole remaining flight is checked against every
+  lantern already in the sky, sampled every 1.5s. Any candidate that would touch another, label
+  included, is rejected. Among the valid candidates, the one farthest from its neighbours wins.
+- **No repeated names.** A name (case-insensitive) is never in the sky twice at once. Records
+  rotate, and new wishes from the 15s refresh are first in line.
+- **Readable greeting.** A lantern passing behind the greeting dims smoothly, by up to 62%, in
+  proportion to how much it overlaps.
+- **Your lantern.** After you press Launch, your lantern is born at the centre of the screen
+  *above* all interface layers. It is larger, tagged in magenta, and slower. Its vanishing point
+  is straight above it, so it rises vertically and recedes. Any lantern whose path would cross it
+  fades out gracefully.
+- **Reduced motion.** The intro is skipped and lanterns are placed statically, without overlaps.
+
+## 7. Resources
+
+All shipped and source assets live in `resources/`. The build inlines them into the Sites
+worker and copies them into `public/` for Vercel at the same URL paths.
+
+```
+resources/
+  images/   rooftop-sky.webp (scene), lantern.webp, rocket.webp, diwali-share.jpg (OG image), kid.webp (unused)
+  fonts/    outfit.woff2, manrope.woff2, playfair-display(-italic).woff2 + OFL licences
+  audio/    diwali-instrumental.mp3
+  icons/    Lucide SVGs + licence (inlined into the HTML at build time)
+  source/   terrace-original.png (master photo), terrace.webp (previous crop)
+```
+
+`/assets/diwali-share.jpg` and `/assets/diwali-preview-2026.jpg` remain as aliases so existing
+social previews keep working.
+
+## 8. Verification checklist
+
+- Phone 390×664, tablet 820×1180, desktop 1440×900, laptop 1366×768: no interface overlaps, no
+  horizontal scroll, lanterns never overlapping or duplicated (measured in the preview).
+- Keyboard: visible magenta focus ring on every control; the dialog uses native modal focus handling.
+- `prefers-reduced-motion` respected; sound is opt-in.
+- The database, API and lantern records are unchanged by this design.
