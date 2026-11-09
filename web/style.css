@@ -1,244 +1,196 @@
-/* =====================================================================
-   Diwali Sky — design system (see DESIGN.md for the rationale)
-   ===================================================================== */
-@font-face{font-family:'Outfit';src:url('/resources/fonts/outfit.woff2') format('woff2');font-weight:100 900;font-display:swap}
-@font-face{font-family:'Manrope';src:url('/resources/fonts/manrope.woff2') format('woff2');font-weight:200 800;font-display:swap}
-@font-face{font-family:'Playfair Display';src:url('/resources/fonts/playfair-display.woff2') format('woff2');font-weight:400 900;font-display:swap}
-@font-face{font-family:'Playfair Display';src:url('/resources/fonts/playfair-display-italic.woff2') format('woff2');font-weight:400 900;font-style:italic;font-display:swap}
+/* Hallmark · shape: Photographic, one screen (the sky is the page) · genre: atmospheric · theme: Kiln (deal 3/3, seed diwali-greeting-where-visitors-097f·c5d49761·2026-11-09·r0) · redesign: full
+ * hero: Poster, centred by request (atmospheric allows the centred canvas) · nav: edge-aligned, the wordmark and the intro controls · footer: none, the count and the share action stand in the poster's foot · imagery: photographs, the rooftop and its own sky · signature: every visitor's named lantern receding into the photographed sky · kiln: ember, display Gloock in place of Boska (Fontshare is blocked by this environment's network policy)
+ * job: launch a lantern, the action in the hero · axes: dark/high-contrast-serif/warm · posture: full-palette · contrast: pass · fold: pass · v2.0.0 */
+/* Hallmark · reworded "A little spark. A sky full of wishes." to "A little spark. A sky of wishes." · 58 names a hero head over seven words */
+/* Hallmark · reworded "Wishing you" and "with love, Hardik" to "Wishing you light, with love from Hardik." · 54 names the eyebrow; its words join the byline */
+/* Hallmark · reworded "A light from <name>" over "Your light is in the sky." to "<name>, your light is in the sky." · 54 names the kicker */
+/* Hallmark · dropped "Light the fuse" and "Share" · 54 names both eyebrows; the fuse and the dialog say it */
+/* Hallmark · dropped "Launch your lantern" and "Write your name and send a little light into the shared sky." · 58 allows a hero head, one sentence and its action; the button now says Launch lantern */
+/* Hallmark · dropped lantern.webp in the success state, #stars and #launch-title · Kiln keeps one picture per idea and nothing that twinkles; the photographed sky has no stars */
+/* Hallmark · dismissed 77 · one screen by design: a sky to watch and one form, with no sections below the poster to add without inventing content */
+/* Hallmark · dropped #wishes · its words joined the byline under 54 */
+/* Hallmark · dismissed 76 and render on the file tier · root-absolute /resources paths resolve only when served; the URL render at localhost loads every image, font and script */
+/* Hallmark · pre-emit critique: P4 H5 E4 S5 R5 V4 · weakest: P, a greeting argues little; it commits to one claim, that the sky is the page and every word sits low on the poster's calm foot */
+@import url("./tokens.css");
+@import url("./base.css");
 
-:root{
- color-scheme:dark;
- /* Colour — midnight indigo sky, marigold and diya-flame actions, maroon controls, lilac text */
- --night-0:#091028;          /* zenith of the photographed sky; page background */
- --night-1:#10112d;          /* deepest surface */
- --night-2:#1b1b47;          /* raised surface */
- --night-3:#2a2b5c;          /* hover surface */
- --marigold:#ffb43f;         /* primary action: marigold garland / diya flame */
- --marigold-deep:#f28c1c;    /* lower stop of the primary gradient */
- --marigold-light:#ffd27a;   /* primary hover, focus ring, eyebrows */
- --on-marigold:#3b1405;      /* text on marigold */
- --maroon:#3a1212;           /* secondary controls (sindoor maroon) */
- --maroon-hover:#52191a;
- --gold-line:#ffb43f59;      /* control borders */
- --gold-text:#ffe6bf;        /* text and icons on maroon */
- --lilac-0:#f7f0ff;          /* primary text */
- --lilac-1:#c7c9e3;          /* secondary text */
- --lilac-2:#9fa2c8;          /* tertiary text, placeholders */
- --line:#f7f0ff1f;           /* hairline borders */
- --line-strong:#f7f0ff40;
- --danger:#ffb4c8;
- --surface:rgba(16,17,45,.94);
- --surface-raised:rgba(27,27,71,.96);
- --shadow-card:0 1px 0 #ffffff14 inset,0 24px 64px -12px #03041ab3,0 2px 8px #03041a66;
+/* ---------- Page tokens (Kiln's block lives in tokens.css) ---------- */
+@font-face { font-family: "Gloock"; src: url("/resources/fonts/gloock.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Geist"; src: url("/resources/fonts/geist.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+:root {
+  /* The photographed sky: its zenith colour, carried past the top edge of the image. */
+  --color-sky: oklch(18% 0.06 268);
+  --color-scrim: color-mix(in oklab, var(--color-paper) 72%, transparent);
+  --color-scrim-soft: color-mix(in oklab, var(--color-paper) 0%, transparent);
+  --color-sky-fade: color-mix(in oklab, var(--color-sky) 0%, transparent);
+  --color-backdrop: color-mix(in oklab, var(--color-paper) 82%, transparent);
+  --color-hover: color-mix(in oklab, var(--color-ink) 8%, transparent);
+  --color-pressed: color-mix(in oklab, var(--color-ink) 14%, transparent);
+  --color-accent-hover: oklch(76% 0.18 52);
+  --color-accent-pressed: oklch(64% 0.19 43);
+  --color-disabled: oklch(30% 0.02 40);
+  --color-disabled-ink: oklch(78% 0.02 60);
+  /* The lantern's own paper tag and the fuse: parts of the photographed objects. */
+  --color-tag: oklch(91% 0.04 82);
+  --color-tag-ink: oklch(30% 0.06 45);
+  --color-fuse: oklch(42% 0.05 65);
+  --color-fuse-lit: oklch(72% 0.09 70);
+  --shadow-tag: 0 2px 6px oklch(8% 0.01 40 / 0.55);
+  /* Canvas colours as hex twins of the tokens above; canvas parsing of oklch is uneven. */
+  --canvas-ink: #f2eadd;
+  --canvas-spark-1: #fff9db;
+  --canvas-spark-2: #ffcf66;
+  --canvas-spark-3: #ff8a00;
+  --canvas-flame: #e13b00;
 
- /* Type families: display / heading / interface */
- --font-display:'Outfit',system-ui,sans-serif;
- --font-heading:'Playfair Display',Georgia,'Times New Roman',serif;
- --font-ui:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif;
-
- /* Type scale (desktop values; overridden for compact screens) */
- --fs-eyebrow:12px;  --lh-eyebrow:16px;
- --fs-caption:12px;  --lh-caption:18px;
- --fs-label:13px;    --lh-label:18px;
- --fs-body:15px;     --lh-body:24px;
- --fs-button:15px;
- --fs-byline:20px;   --lh-byline:28px;
- --fs-title:26px;    --lh-title:32px;
- --fs-intro:clamp(32px,4.2vw,56px);
-
- /* Spacing — 4pt grid */
- --s-1:4px;--s-2:8px;--s-3:12px;--s-4:16px;--s-5:20px;--s-6:24px;--s-8:32px;--s-10:40px;--s-12:48px;--s-16:64px;
-
- /* Shape & controls */
- --r-sm:10px;--r-md:14px;--r-lg:20px;--r-pill:999px;
- --control:52px;--icon-button:44px;--icon:18px;
- --card-width:460px;
- --gutter:clamp(16px,4vw,40px);
- --safe-top:max(var(--s-4),env(safe-area-inset-top));
- --safe-bottom:max(var(--s-6),env(safe-area-inset-bottom));
- --ease-out:cubic-bezier(.2,.7,.2,1);
- --t-fast:180ms;
-
- /* Scene geometry: --roof is the on-screen height of the original rooftop photo */
- --roof:max(100vh,90vw);
- --title-height:clamp(112px,11vw,168px);
+  --control: 50px;
+  --control-small: 44px;
+  --icon: 18px;
+  --title-size: clamp(3.25rem, 6.4vw + 1rem, 8.5rem);
+  --roof: max(100svh, 90vw);
 }
-@supports(height:100svh){:root{--roof:max(100svh,90vw)}}
 
-*,*::before,*::after{box-sizing:border-box}
-html{background:var(--night-0)}
-body{margin:0;min-height:100svh;overflow-x:hidden;background:var(--night-0);color:var(--lilac-0);font:400 var(--fs-body)/var(--lh-body) var(--font-ui);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-button,input{font:inherit;color:inherit}
-button{cursor:pointer;touch-action:manipulation}
-button:disabled{opacity:.6;cursor:progress}
-:focus-visible{outline:2px solid var(--marigold-light);outline-offset:3px}
-[hidden]{display:none!important}
-.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-.icon{width:var(--icon);height:var(--icon);flex:none;stroke-width:2}
+/* ---------- Base for this page ---------- */
+html { background: var(--color-sky); }
+body { min-height: 100svh; background: var(--color-sky); font-size: var(--text-md); }
+button { cursor: pointer; touch-action: manipulation; color: inherit; }
+.icon { width: var(--icon); height: var(--icon); flex: none; stroke-width: 2; }
+.lead { color: var(--color-ink-2); }
+.caption { font-size: var(--text-sm); line-height: 1.45; color: var(--color-muted); }
+.field-label { display: block; margin-block-end: var(--space-xs); font-size: var(--text-sm); font-weight: 500; color: var(--color-ink-2); }
+.field-error { font-size: var(--text-sm); font-weight: 500; color: var(--color-error); }
+.field-error:not(:empty) { margin-block-start: var(--space-xs); }
 
-/* ---------- Typography roles ---------- */
-.eyebrow{margin:0;font:700 var(--fs-eyebrow)/var(--lh-eyebrow) var(--font-ui);letter-spacing:.22em;text-transform:uppercase;color:var(--marigold-light)}
-.intro-title{margin:var(--s-4) 0 0;font:500 var(--fs-intro)/1.15 var(--font-heading);letter-spacing:-.01em;color:var(--lilac-0);text-wrap:balance;text-shadow:0 2px 24px #03041a99}
-.display{margin:0}
-.byline{margin:0;font:italic 400 var(--fs-byline)/var(--lh-byline) var(--font-heading);color:var(--lilac-1)}
-.card-title{margin:0;font:600 var(--fs-title)/var(--lh-title) var(--font-heading);letter-spacing:-.005em;color:var(--lilac-0);text-wrap:balance}
-.card-body{margin:var(--s-2) 0 0;text-wrap:pretty;font:400 var(--fs-body)/var(--lh-body) var(--font-ui);color:var(--lilac-1)}
-.caption{margin:0;font:400 var(--fs-caption)/var(--lh-caption) var(--font-ui);color:var(--lilac-2)}
-.field-label{display:block;margin:0 0 var(--s-2);font:600 var(--fs-label)/var(--lh-label) var(--font-ui);letter-spacing:.01em;color:var(--lilac-0)}
+/* ---------- Controls: the ember pill and the ghost pill, all eight states ---------- */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-xs); min-height: var(--control); padding-inline: var(--space-lg); border: 0; border-radius: var(--radius-pill); font-family: var(--font-body); font-size: var(--text-md); font-weight: 500; line-height: 1; white-space: nowrap; text-decoration: none; transition: background-color var(--dur-short) var(--ease-out), color var(--dur-short) var(--ease-out), box-shadow var(--dur-short) var(--ease-out); }
+.btn-primary { background: var(--color-accent); color: var(--color-accent-ink); }
+.btn-primary:hover { background: var(--color-accent-hover); }
+.btn-primary:active { background: var(--color-accent-pressed); }
+.btn-ghost { background: transparent; color: var(--color-ink); box-shadow: inset 0 0 0 var(--rule-hair) var(--color-muted); }
+.btn-ghost:hover { background: var(--color-hover); }
+.btn-ghost:active { background: var(--color-pressed); }
+.btn-small { min-height: var(--control-small); padding-inline: var(--space-md); font-size: var(--text-sm); }
+.btn:disabled, .btn[aria-disabled="true"] { background: var(--color-disabled); color: var(--color-disabled-ink); box-shadow: none; cursor: not-allowed; opacity: 0.92; }
+.btn:focus-visible, .icon-button:focus-visible, #name:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3px; transition: none; }
+.icon-button { display: grid; place-items: center; width: var(--control-small); height: var(--control-small); padding: 0; border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--color-ink); box-shadow: inset 0 0 0 var(--rule-hair) var(--color-muted); transition: background-color var(--dur-short) var(--ease-out); }
+.icon-button:hover { background: var(--color-hover); }
+.icon-button:active { background: var(--color-pressed); }
+.icon-button:disabled { cursor: not-allowed; opacity: 0.6; background: var(--color-disabled); }
 
-/* ---------- Buttons ---------- */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--s-2);min-height:var(--icon-button);padding:0 var(--s-5);border:1px solid transparent;border-radius:var(--r-md);font:700 var(--fs-button)/1 var(--font-ui);letter-spacing:.01em;white-space:nowrap;transition:background var(--t-fast),border-color var(--t-fast),color var(--t-fast),transform var(--t-fast)}
-.btn:active{transform:translateY(1px)}
-.btn-primary{height:var(--control);padding:0 var(--s-6);background:linear-gradient(180deg,var(--marigold),var(--marigold-deep));color:var(--on-marigold);border-color:#ffd27a80;box-shadow:inset 0 1px 0 #fff3d699,0 8px 24px -8px #f28c1caa}
-.btn-primary:hover{background:linear-gradient(180deg,var(--marigold-light),var(--marigold))}
-.btn-secondary{height:var(--icon-button);background:var(--maroon);border-color:var(--gold-line);color:var(--gold-text);font-size:14px}
-.btn-secondary .icon{color:var(--marigold)}
-.btn-secondary:hover{background:var(--maroon-hover);border-color:var(--marigold)}
-.btn-ghost{height:var(--icon-button);background:transparent;color:var(--lilac-1);font-size:13px;font-weight:600}
-.btn-ghost:hover{color:var(--lilac-0);background:#f7f0ff12}
-.icon-button{display:grid;place-items:center;width:var(--icon-button);height:var(--icon-button);padding:0;border:1px solid var(--gold-line);border-radius:var(--r-md);background:var(--maroon);color:var(--marigold);transition:background var(--t-fast),border-color var(--t-fast)}
-.icon-button:hover{background:var(--maroon-hover);border-color:var(--marigold)}
+/* ---------- The scene: one photograph, extended upward with its own sky ---------- */
+#world { position: fixed; inset: 0; overflow: hidden; background: var(--color-sky); }
+#camera { position: absolute; inset: 0; transform: scale(1.06); transform-origin: 50% 100%; transition: transform 4.6s var(--ease-in-out); }
+/* After launch the camera tilts up until only the lit parapet stays in frame, at 94% of the screen. */
+.zoomed #camera { transform: translateY(calc(var(--roof) * 0.478 - 6svh)) scale(1); }
+#scene { position: absolute; left: 50%; bottom: 0; width: calc(var(--roof) * 1.5); height: calc(var(--roof) * 2); transform: translateX(-50%); background: url("/resources/images/rooftop-sky.webp") center bottom / 100% 100% no-repeat; }
+#world::before { content: ""; position: absolute; inset: 0 0 auto; height: 22svh; z-index: var(--z-base); pointer-events: none; background: linear-gradient(var(--color-sky), var(--color-sky-fade)); }
+/* Kiln's scrim: the paper at 72% under the poster's foot, so the words sit on the dark side of the photograph. */
+.scrim { position: absolute; inset: auto 0 0; height: 62svh; z-index: 3; pointer-events: none; background: linear-gradient(to top, var(--color-scrim), var(--color-scrim-soft)); opacity: 0; transition: opacity 2s var(--ease-out); }
+.formed .scrim { opacity: 1; }
+#bottle, #rocket { position: absolute; bottom: 5svh; left: calc(50% - 6svh); width: 12svh; height: 24svh; }
+#bottle img, #rocket img { width: 100%; height: 100%; object-fit: contain; }
+#bottle { clip-path: inset(50% 0 0 0); transition: opacity 1.5s var(--ease-out); }
+#rocket img { clip-path: inset(0 0 50% 0); }
+.launched #rocket img, .launched #fuse-svg { visibility: hidden; }
+.formed #bottle { opacity: 0; }
+#fuse-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+#fuse-track, #fuse-burn { fill: none; stroke-width: 4; stroke-linecap: round; }
+#fuse-track { stroke: var(--color-fuse); }
+#fuse-burn { stroke: var(--color-fuse-lit); }
+#fireworks { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 4; pointer-events: none; }
 
-/* ---------- Scene: one photograph, extended upward with its own sky ---------- */
-#world{position:fixed;inset:0;overflow:hidden;background:var(--night-0)}
-#camera{position:absolute;inset:0;transform:scale(1.06);transform-origin:50% 100%;transition:transform 4.6s cubic-bezier(.45,0,.2,1)}
-/* After launch the camera tilts up: only the lit parapet stays in frame, at 94% of the viewport height. */
-body.zoomed #camera{transform:translateY(calc(var(--roof) * .478 - 6vh)) scale(1)}
-@supports(height:100svh){body.zoomed #camera{transform:translateY(calc(var(--roof) * .478 - 6svh)) scale(1)}}
-#scene{position:absolute;left:50%;bottom:0;width:calc(var(--roof) * 1.5);height:calc(var(--roof) * 2);transform:translateX(-50%);background:url('/resources/images/rooftop-sky.webp') center bottom/100% 100% no-repeat}
-/* The only gradient: a soft continuation of the photo's own zenith colour at the very top. */
-#world::after{content:'';position:absolute;inset:0 0 auto;height:22vh;pointer-events:none;background:linear-gradient(var(--night-0),#09102800);z-index:1}
-#stars{position:absolute;inset:0 0 50%;pointer-events:none;opacity:0;transition:opacity 3s ease 1s;z-index:1}
-.formed #stars{opacity:.55}
-.star{position:absolute;border-radius:50%;background:#efe7ff;animation:twinkle 6s ease-in-out infinite}
-#bottle,#rocket{position:absolute;bottom:5vh;left:calc(50% - 6vh);width:12vh;height:24vh}
-#bottle img,#rocket img{width:100%;height:100%;object-fit:contain}
-#bottle{clip-path:inset(50% 0 0 0);filter:drop-shadow(2px 6px 4px #0006);transition:opacity 1.5s}
-#rocket img{clip-path:inset(0 0 50% 0)}
-.launched #rocket img,.launched #fuse-svg{visibility:hidden}
-.formed #bottle{opacity:0}
-#fuse-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-#fuse-track,#fuse-burn{fill:none;stroke-width:4;stroke-linecap:round}
-#fuse-track{stroke:#624c32}#fuse-burn{stroke:#d0a05f}
-#ember{filter:drop-shadow(0 0 3px #ffaf3b)}
-#fireworks{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:3;pointer-events:none}
+/* ---------- Lanterns: photographs, placed and moved by app.js ---------- */
+#lanterns, #my-lantern-layer { position: absolute; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+#my-lantern-layer { position: fixed; z-index: var(--z-sticky); }
+.lantern { position: absolute; left: 0; top: 0; width: var(--w, 64px); aspect-ratio: 600 / 657; opacity: 0; will-change: transform, opacity; contain: layout style; }
+.lantern img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.lantern-name { position: absolute; left: 50%; top: 95%; transform: translate(-50%, -50%) rotate(-3deg); max-width: 220%; padding: 0.25em 0.7em; border-radius: 3px; background: var(--color-tag); color: var(--color-tag-ink); font: 500 var(--fs, 11px) / 1.2 var(--font-body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: var(--shadow-tag); }
+.lantern.mine .lantern-name { box-shadow: 0 0 0 2px var(--color-accent), var(--shadow-tag); }
 
-/* ---------- Lanterns (positions are driven by app.js) ---------- */
-#lanterns,#my-lantern-layer{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:2}
-#my-lantern-layer{position:fixed;z-index:30}
-.lantern{position:absolute;left:0;top:0;width:var(--w,64px);aspect-ratio:600/657;opacity:0;will-change:transform,opacity;contain:layout style}
-.lantern img{position:relative;display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 calc(var(--w,64px) * .22) #ff8a3a59)}
-.lantern-glow{position:absolute;left:50%;top:66%;width:120%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(closest-side,#ffb45c66,#ff7a2a22 55%,#ff7a2a00);animation:burn 3.2s ease-in-out infinite alternate;animation-delay:var(--flicker,0s)}
-.lantern-name{position:absolute;left:50%;top:95%;transform:translate(-50%,-50%) rotate(-3deg);max-width:220%;padding:.25em .7em;border-radius:3px;background:#f1e3c6;color:#4a2a18;font:700 var(--fs,11px)/1.2 var(--font-ui);letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 2px 6px #0007}
-.lantern.mine .lantern-name{background:#fff1d6;color:#5a1a08;box-shadow:0 0 0 1px var(--marigold),0 2px 10px #ffb43f66}
-.lantern.mine img{filter:drop-shadow(0 0 calc(var(--w,64px) * .3) #ff9a4a8c)}
+/* ---------- Chrome ---------- */
+.topbar { position: fixed; inset: 0 0 auto; z-index: var(--z-sticky-nav); pointer-events: none; }
+.topbar-inner { display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); min-height: 72px; padding-block-start: env(safe-area-inset-top); }
+.topbar-inner > * { pointer-events: auto; }
+.wordmark { font-family: var(--font-display); font-size: var(--text-lg); line-height: 1; letter-spacing: -0.01em; color: var(--color-ink); }
+.controls { display: flex; align-items: center; gap: var(--space-xs); margin-inline-start: auto; }
 
-/* ---------- Header ---------- */
-.topbar{position:fixed;inset:0 0 auto;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:var(--s-4);padding:var(--safe-top) var(--gutter) 0;pointer-events:none}
-.topbar>*{pointer-events:auto}
-.brand{margin:0;font:600 13px/1 var(--font-ui);letter-spacing:.04em;color:var(--lilac-1);opacity:0;transition:opacity .8s}
-.revealed .brand{opacity:1}
-.controls{display:flex;align-items:center;gap:var(--s-2);margin-left:auto}
+#loading { position: fixed; inset: 0; z-index: var(--z-modal); display: none; place-items: center; background: var(--color-sky); }
+.js #loading:not([hidden]) { display: grid; }
+.loading-ember { width: 8px; height: 8px; border-radius: 50%; background: var(--color-accent); }
 
-/* ---------- Loading ---------- */
-#loading{position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:var(--night-0)}
-.loading-ember{width:8px;height:8px;border-radius:50%;background:#ffe7a4;box-shadow:0 0 20px 8px #ffab3140;animation:twinkle 1.3s infinite}
+/* ---------- The poster: sky above, every word on its calm foot ---------- */
+#stage { position: relative; z-index: var(--z-raised); display: flex; flex-direction: column; min-height: 100svh; padding-block: calc(72px + env(safe-area-inset-top)) max(var(--space-2xl), env(safe-area-inset-bottom)); pointer-events: none; }
+#stage > *, .poster > *, .poster-main > * { pointer-events: auto; }
+#intro-copy { position: absolute; inset-block-start: 22svh; inset-inline: var(--gutter); display: flex; justify-content: center; text-align: center; }
+.intro-line { max-width: 14ch; font-family: var(--font-display); font-size: var(--text-display); line-height: 1.04; letter-spacing: var(--tracking-display); color: var(--color-ink); text-wrap: balance; }
+.poster { margin-block-start: auto; display: flex; flex-direction: column; align-items: center; gap: var(--space-lg); text-align: center; }
+.poster-main { display: flex; flex-direction: column; align-items: center; gap: var(--space-xl); width: 100%; min-width: 0; }
+.greeting { display: flex; flex-direction: column; align-items: center; gap: var(--space-md); width: 100%; }
+#particle-title { width: 100%; max-width: none; overflow-wrap: normal; font-size: var(--title-size); line-height: 1; height: 1.1em; }
+.title-text { display: block; white-space: nowrap; }
+.js .title-text { visibility: hidden; }
+.launch { width: 100%; max-width: 34rem; }
+.field-row { display: flex; gap: var(--space-xs); }
+#name { flex: 1; min-width: 0; height: var(--control); padding-inline: var(--space-md); border: var(--rule-hair) solid var(--color-muted); border-radius: var(--radius-well); background: var(--color-paper-2); font-size: var(--text-md); color: var(--color-ink); }
+#name::placeholder { color: var(--color-muted); }
+#name:hover { background: var(--color-paper-3); }
+#name:focus { outline: 2px solid var(--color-focus); outline-offset: 3px; }
+#name:disabled { cursor: not-allowed; opacity: 0.6; }
+#privacy { margin-block-start: var(--space-sm); }
+#launch-success { display: flex; flex-direction: column; gap: var(--space-sm); }
+#launch-success h2 { font-size: var(--text-2xl); max-width: 22ch; }
+.launch.success .launch-form-view { display: none; }
+.footer-bar { display: flex; align-items: center; justify-content: center; gap: var(--space-lg); }
+.sky-count { color: var(--color-ink-2); font-size: var(--text-sm); }
+#sky-count-copy { display: inline-flex; align-items: baseline; gap: var(--space-xs); }
+#sky-count-copy strong { font-family: var(--font-display); font-weight: var(--display-weight); font-size: var(--text-3xl); line-height: 1; letter-spacing: -0.03em; font-variant-numeric: lining-nums tabular-nums; color: var(--color-ink); }
 
-/* ---------- Page structure: greeting / open sky / action / footer ---------- */
-#stage{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;min-height:100vh;min-height:100svh;padding:calc(var(--safe-top) + var(--icon-button) + var(--s-6)) var(--gutter) var(--safe-bottom);pointer-events:none}
-#stage>*{pointer-events:auto}
-#intro-copy{position:absolute;top:22vh;left:var(--gutter);right:var(--gutter);text-align:center;transition:opacity .8s,transform 1s var(--ease-out)}
-.launched #intro-copy{opacity:0;transform:translateY(-12px)}
-.greeting{width:min(100%,1040px);text-align:center;pointer-events:none}
-#wishes,#byline{opacity:0;transform:translateY(6px);transition:opacity .7s,transform .7s var(--ease-out)}
-#byline{transition-delay:.25s}
-.revealed #wishes,.revealed #byline{opacity:1;transform:none}
-#particle-title{height:var(--title-height);margin:var(--s-3) auto var(--s-2);width:100%}
-.stage-gap{flex:1 1 var(--s-8);min-height:var(--s-8)}
-
-.card{position:relative;width:min(100%,var(--card-width));padding:var(--s-8);border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface);box-shadow:var(--shadow-card);text-align:left;animation:rise .8s var(--ease-out) both}
-.card::before{content:'';position:absolute;inset:0 var(--s-8) auto;height:1px;background:linear-gradient(90deg,#ffb43f00,#ffb43faa,#ffb43f00)}
-#lantern-form{margin-top:var(--s-6)}
-.field-row{display:flex;gap:var(--s-2)}
-#name{flex:1;min-width:0;height:var(--control);padding:0 var(--s-4);border:1px solid var(--line-strong);border-radius:var(--r-md);background:var(--night-1);font:500 16px/1 var(--font-ui);color:var(--lilac-0);transition:border-color var(--t-fast),box-shadow var(--t-fast)}
-#name::placeholder{color:var(--lilac-2)}
-#name:hover{border-color:#f7f0ff66}
-#name:focus{outline:none;border-color:var(--marigold);box-shadow:0 0 0 3px #ffb43f33}
-.field-error{margin:0;font:600 var(--fs-caption)/var(--lh-caption) var(--font-ui);color:var(--danger)}
-.field-error:not(:empty){margin-top:var(--s-2)}
-#privacy{margin-top:var(--s-3)}
-#launch-success{display:grid;grid-template-columns:64px minmax(0,1fr);gap:var(--s-5);align-items:center}
-.success-art{width:64px;animation:sway 4s ease-in-out infinite}
-.success-art img{display:block;width:100%;height:auto;filter:drop-shadow(0 0 18px #ff935966)}
-#launch-success .card-title{margin-top:var(--s-2)}
-#release-panel.success .launch-form-view{display:none}
-#release-panel.success{animation:rise .6s var(--ease-out) both}
-
-.footer-bar{display:flex;align-items:center;justify-content:space-between;gap:var(--s-3);width:min(100%,var(--card-width));margin-top:var(--s-4);animation:rise .8s var(--ease-out) .15s both}
-.sky-count{display:flex;align-items:center;gap:var(--s-2);min-height:var(--icon-button);padding:0 var(--s-4) 0 var(--s-3);border:1px solid var(--gold-line);border-radius:var(--r-md);background:var(--maroon)}
-.count-icon{width:18px;height:auto}
-#sky-count-copy{display:flex;align-items:baseline;gap:6px;font:500 12px/1 var(--font-ui);color:var(--gold-text);white-space:nowrap}
-#sky-count-copy strong{font:700 18px/1 var(--font-display);color:var(--marigold-light);letter-spacing:-.01em}
-.footer-bar .btn-secondary{margin-left:auto}
-
-/* Wide screens: footer items move to the bottom corners, the card stays centred. */
-@media(min-width:1024px){
- .footer-bar{position:fixed;left:var(--gutter);right:var(--gutter);bottom:var(--safe-bottom);width:auto;margin:0;pointer-events:none}
- .footer-bar>*{pointer-events:auto}
- #stage{padding-bottom:calc(var(--safe-bottom) + var(--s-2))}
-}
+/* Reveal: visible by default; only a running script holds the byline back until the sparks form. */
+.js #byline { opacity: 0; transition: opacity var(--dur-long) var(--ease-out); }
+.js .revealed #byline { opacity: 1; }
+.js .launch, .js .footer-bar { animation: settle var(--dur-long) var(--ease-out) both; }
+.js #intro-copy { transition: opacity 0.8s var(--ease-out); }
+.js .launched #intro-copy { opacity: 0; }
 
 /* ---------- Share dialog ---------- */
-.share-dialog{width:min(420px,calc(100% - 32px));padding:var(--s-8);border:1px solid var(--line);border-radius:var(--r-lg);background:var(--night-1);color:var(--lilac-0);box-shadow:var(--shadow-card)}
-.share-dialog::backdrop{background:#03041acc}
-.share-dialog .card-title{margin-top:var(--s-2)}
-.share-close{position:absolute;top:var(--s-4);right:var(--s-4)}
-.share-options{display:grid;grid-template-columns:1fr 1fr;gap:var(--s-2);margin-top:var(--s-6)}
-.share-option{display:flex;align-items:center;gap:var(--s-3);min-height:var(--control);padding:0 var(--s-4);border:1px solid var(--gold-line);border-radius:var(--r-md);background:var(--maroon);font:600 14px/1 var(--font-ui);color:var(--gold-text);text-decoration:none;transition:background var(--t-fast),border-color var(--t-fast)}
-.share-option .icon{color:var(--marigold)}
-.share-option:hover{background:var(--maroon-hover);border-color:var(--marigold)}
-#copy-feedback:not(:empty){margin-top:var(--s-3)}
+.share-dialog { width: min(28rem, calc(100% - 2 * var(--space-md))); padding: var(--space-xl); border: var(--rule-hair) solid var(--color-rule); border-radius: var(--radius-card); background: var(--color-paper-2); color: var(--color-ink); }
+.share-dialog::backdrop { background: var(--color-backdrop); }
+.share-dialog h2 { font-size: var(--text-2xl); padding-inline-end: var(--space-2xl); }
+.share-dialog .lead { margin-block-start: var(--space-sm); font-size: var(--text-md); }
+.share-close { position: absolute; inset-block-start: var(--space-md); inset-inline-end: var(--space-md); }
+.share-options { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-xs); margin-block-start: var(--space-lg); }
+.share-option { justify-content: flex-start; padding-inline: var(--space-md); }
+#copy-feedback:not(:empty) { margin-block-start: var(--space-sm); }
 
-/* ---------- Compact screens ---------- */
-@media(max-width:599px){
- :root{--fs-body:14px;--lh-body:21px;--fs-title:21px;--lh-title:26px;--fs-byline:17px;--lh-byline:24px;--fs-eyebrow:11px;--fs-button:15px;--control:48px;--title-height:150px;--card-width:100%}
- .card{padding:var(--s-5)}
- .card::before{inset:0 var(--s-5) auto}
- #lantern-form{margin-top:var(--s-4)}
- .btn-primary{padding:0 var(--s-4)}
- .brand{display:none}
- #particle-title{margin:var(--s-2) auto var(--s-1)}
- #launch-success{grid-template-columns:48px minmax(0,1fr);gap:var(--s-4)}
- .success-art{width:48px}
- .footer-bar{margin-top:var(--s-3)}
- .sky-count{padding:0 var(--s-3) 0 var(--s-2)}
- #sky-count-copy{font-size:11px;gap:4px}#sky-count-copy strong{font-size:16px}
- .btn-secondary{font-size:13px;padding:0 var(--s-4)}
- .share-dialog{padding:var(--s-6)}
+/* ---------- Narrow screens: one column, the poster's foot stacks ---------- */
+@media (max-width: 60rem) {
+  #stage { padding-block-end: max(var(--space-lg), env(safe-area-inset-bottom)); }
 }
-@media(max-width:359px){.sky-count .count-label{display:none}}
-@media(max-height:700px) and (max-width:599px){:root{--title-height:120px}#lantern-form{margin-top:var(--s-3)}#release-panel .card-body{display:none}}
-@media(max-height:760px) and (min-width:600px){:root{--title-height:clamp(100px,9vw,132px)}.card{padding:var(--s-6)}#lantern-form{margin-top:var(--s-4)}}
-/* Landscape phones: greeting left, action right. */
-@media(max-height:500px) and (min-width:600px){
- :root{--title-height:110px}
- #stage{display:grid;grid-template-columns:1fr minmax(0,400px);grid-template-rows:auto 1fr auto;column-gap:var(--s-8);align-items:center;padding-top:calc(var(--safe-top) + var(--icon-button) + var(--s-2))}
- .greeting{grid-row:1/4;align-self:center}
- .stage-gap{display:none}
- .card{grid-column:2;grid-row:1/3;padding:var(--s-5)}
- #release-panel .card-body{display:none}
- .footer-bar{position:static;grid-column:2;grid-row:3;width:100%}
+@media (max-width: 40rem) {
+  :root { --title-size: clamp(2.75rem, 13vw, 3.5rem); }
+  .wordmark { font-size: var(--text-md); }
+  .poster-main { gap: var(--space-lg); }
+  .greeting { gap: var(--space-xs); }
+  #sky-count-copy strong { font-size: var(--text-2xl); }
+  .share-dialog { padding: var(--space-lg); }
+}
+@media (max-width: 40rem) and (max-height: 700px) { #privacy { display: none; } }
+/* Landscape phones: the greeting and the form side by side. */
+@media (max-height: 500px) and (min-width: 600px) {
+  :root { --title-size: 2.75rem; }
+  .poster, .poster-main { gap: var(--space-sm); }
+  .greeting { gap: var(--space-2xs); }
+  #privacy { display: none; }
+  .field-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 }
 
 /* ---------- Keyboard open on phones: the form owns the visible space ---------- */
-body.keyboard-active .greeting,body.keyboard-active .footer-bar,body.keyboard-active .topbar{opacity:0;pointer-events:none}
-body.keyboard-active #release-panel{position:fixed;left:50%;top:calc(var(--visual-top,0px) + var(--visual-height,100svh) / 2);width:calc(100% - 32px);transform:translate(-50%,-50%);animation:none;z-index:50}
+.keyboard-active .greeting, .keyboard-active .footer-bar, .keyboard-active .topbar { opacity: 0; pointer-events: none; }
+.keyboard-active .launch { position: fixed; inset-inline: var(--gutter); inset-block-start: calc(var(--visual-top, 0px) + var(--visual-height, 100svh) / 2); transform: translateY(-50%); max-width: none; padding: var(--space-lg); border: var(--rule-hair) solid var(--color-rule); border-radius: var(--radius-card); background: var(--color-paper-2); animation: none; z-index: var(--z-modal); }
 
-/* ---------- Motion ---------- */
-@keyframes twinkle{0%,100%{opacity:.3}50%{opacity:.9}}
-@keyframes burn{from{opacity:.65;transform:translate(-50%,-50%) scale(.94)}to{opacity:1;transform:translate(-50%,-50%) scale(1.04)}}
-@keyframes rise{from{opacity:0;translate:0 12px}to{opacity:1;translate:0 0}}
-@keyframes sway{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-4px) rotate(2deg)}}
-@media(prefers-reduced-motion:reduce){
- *,*::before,*::after{animation:none!important;transition:none!important}
+@keyframes settle { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  #camera, .scrim, #bottle, .js #intro-copy { transition: none; }
+  .js .launch, .js .footer-bar { animation: none; }
+  .js #byline { transition: none; }
 }

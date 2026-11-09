@@ -1,3 +1,13 @@
 node_modules/
 dist/
 public/
+.hallmark/before/
+.hallmark/shots/
+.hallmark/compare.html
+.hallmark/salt
+.hallmark/before/
+.hallmark/shots/
+.hallmark/compare.html
+.hallmark/salt
+.hallmark/before.json
+.hallmark/before.txt

@@ -1,78 +1,71 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#091028"><title>A sky full of wishes · Happy Diwali</title><meta name="description" content="A spark becomes a wish. Watch the Diwali sky light up, then launch a lantern with your name."><link rel="canonical" href="https://diwali-wishes.haha-hardikk.chatgpt.site/diwali"><meta name="robots" content="index, follow, max-image-preview:large"><meta property="og:locale" content="en_IN"><meta property="og:type" content="website"><meta property="og:site_name" content="A sky full of wishes"><meta property="og:url" content="https://diwali-wishes.haha-hardikk.chatgpt.site/diwali"><meta property="og:title" content="Happy Diwali — a little light from Hardik"><meta property="og:description" content="Watch the sky sparkle, then launch a lantern with your name. Pass on the light this Diwali."><meta property="og:image" content="https://diwali-wishes.haha-hardikk.chatgpt.site/assets/diwali-share.jpg"><meta property="og:image:secure_url" content="https://diwali-wishes.haha-hardikk.chatgpt.site/assets/diwali-share.jpg"><meta property="og:image:type" content="image/jpeg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Happy Diwali in glowing pink lettering over an Indian rooftop with red sky lanterns"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Happy Diwali — a little light from Hardik"><meta name="twitter:description" content="Launch a lantern. Leave a little light."><meta name="twitter:image" content="https://diwali-wishes.haha-hardikk.chatgpt.site/assets/diwali-share.jpg"><link rel="preload" href="/resources/fonts/outfit.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/resources/fonts/manrope.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/resources/fonts/playfair-display.woff2" as="font" type="font/woff2" crossorigin><style>/*SITE_CSS*/</style></head><body>
+<!doctype html><html lang="en" class="no-js"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#091028"><title>A sky full of wishes · Happy Diwali</title><meta name="description" content="A spark becomes a wish. Watch the Diwali sky light up, then launch a lantern with your name."><link rel="canonical" href="https://diwali-wishes.haha-hardikk.chatgpt.site/diwali"><meta name="robots" content="index, follow, max-image-preview:large"><meta property="og:locale" content="en_IN"><meta property="og:type" content="website"><meta property="og:site_name" content="A sky full of wishes"><meta property="og:url" content="https://diwali-wishes.haha-hardikk.chatgpt.site/diwali"><meta property="og:title" content="Happy Diwali, a little light from Hardik"><meta property="og:description" content="Watch the sky sparkle, then launch a lantern with your name. Pass on the light this Diwali."><meta property="og:image" content="https://diwali-wishes.haha-hardikk.chatgpt.site/assets/diwali-share.jpg"><meta property="og:image:secure_url" content="https://diwali-wishes.haha-hardikk.chatgpt.site/assets/diwali-share.jpg"><meta property="og:image:type" content="image/jpeg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Happy Diwali in glowing pink lettering over an Indian rooftop with red sky lanterns"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Happy Diwali, a little light from Hardik"><meta name="twitter:description" content="Launch a lantern. Leave a little light."><meta name="twitter:image" content="https://diwali-wishes.haha-hardikk.chatgpt.site/assets/diwali-share.jpg"><link rel="preload" href="/resources/fonts/gloock.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/resources/fonts/geist.woff2" as="font" type="font/woff2" crossorigin><style>/*SITE_CSS*/</style></head><body>
 <div id="world">
  <div id="camera">
   <div id="scene"></div>
   <div id="bottle"><img src="/resources/images/rocket.webp" alt="A Diwali rocket standing in a green glass bottle"></div>
   <div id="rocket" aria-hidden="true"><img src="/resources/images/rocket.webp" alt=""><svg id="fuse-svg" viewBox="0 0 400 800"><defs><radialGradient id="flame-glow"><stop stop-color="#ffd788" stop-opacity=".9"/><stop offset="1" stop-color="#ffb938" stop-opacity="0"/></radialGradient></defs><path id="fuse-track" d="M205 215 C222 231 246 247 235 265 C222 285 240 292 260 288"/><path id="fuse-burn" d="M205 215 C222 231 246 247 235 265 C222 285 240 292 260 288"/><g id="ember"><circle r="30" fill="url(#flame-glow)"/><path d="M0 -14 Q11 -2 4 6 Q-7 13 -7 2 Q-6 -5 0 -14" fill="#ffe8a8"/><circle r="3" fill="#fff8dc"/></g></svg></div>
  </div>
- <div id="stars" aria-hidden="true"></div>
  <div id="lanterns" aria-label="Lanterns released by visitors"></div>
  <canvas id="fireworks" aria-hidden="true"></canvas>
+ <div class="scrim" aria-hidden="true"></div>
 </div>
 <div id="my-lantern-layer" aria-hidden="true"></div>
 <header class="topbar" aria-label="Experience controls">
- <p class="brand" id="brand">A sky full of wishes</p>
- <div class="controls">
-  <button id="skip" class="btn btn-ghost">Skip intro {{icon:arrow-up-right}}</button>
-  <button class="icon-button" id="replay" hidden aria-label="Replay the launch" title="Replay the launch">{{icon:rotate-ccw}}</button>
-  <button class="icon-button" id="sound" aria-pressed="false" aria-label="Turn music and sound on" title="Turn music and sound on"><span class="sound-off">{{icon:volume-x}}</span><span class="sound-on" hidden>{{icon:volume-2}}</span></button>
+ <div class="container topbar-inner">
+  <p class="wordmark" id="brand">A sky full of wishes</p>
+  <div class="controls">
+   <button id="skip" class="btn btn-ghost btn-small">Skip intro</button>
+   <button class="icon-button" id="replay" hidden aria-label="Replay the launch" title="Replay the launch">{{icon:rotate-ccw}}</button>
+   <button class="icon-button" id="sound" aria-pressed="false" aria-label="Turn music and sound on" title="Turn music and sound on"><span class="sound-off">{{icon:volume-x}}</span><span class="sound-on" hidden>{{icon:volume-2}}</span></button>
+  </div>
  </div>
 </header>
 <div id="loading" role="status" aria-label="Loading the Diwali scene"><span class="loading-ember"></span></div>
-<main id="stage">
- <section id="intro-copy" aria-live="polite">
-  <p class="eyebrow">Light the fuse</p>
-  <h1 class="intro-title">A little spark.<br>A sky full of wishes.</h1>
+<main id="stage" class="container">
+ <section id="intro-copy">
+  <p class="intro-line">A little spark. A sky of wishes.</p>
  </section>
- <section id="greeting" class="greeting" aria-label="Happy Diwali wishes">
-  <p id="wishes" class="eyebrow">Wishing you</p>
-  <h2 id="particle-title" class="display"><span class="sr-only">Happy Diwali</span></h2>
-  <p id="byline" class="byline">with love, Hardik</p>
- </section>
- <div class="stage-gap" aria-hidden="true"></div>
- <section id="release-panel" class="card" hidden aria-labelledby="launch-title">
-  <div class="launch-form-view">
-   <h3 id="launch-title" class="card-title">Launch your lantern</h3>
-   <p class="card-body">Write your name and send a little light into the shared sky.</p>
-   <form id="lantern-form" novalidate>
-    <label class="field-label" for="name">Your name</label>
-    <div class="field-row">
-     <input id="name" name="name" maxlength="24" minlength="2" placeholder="e.g. Diya" autocomplete="given-name" enterkeyhint="send" required aria-describedby="privacy form-status">
-     <button id="release" class="btn btn-primary" type="submit"><span>Launch</span>{{icon:arrow-up-right}}</button>
+ <div class="poster">
+  <div class="poster-main">
+   <section id="greeting" class="greeting" aria-labelledby="particle-title">
+    <h1 id="particle-title" class="display"><span class="title-text">Happy Diwali</span></h1>
+    <p id="byline" class="lead">Wishing you light, with love from Hardik.</p>
+   </section>
+   <section id="release-panel" class="launch" hidden aria-label="Launch your lantern">
+    <div class="launch-form-view">
+     <form id="lantern-form" novalidate>
+      <label class="field-label" for="name">Your name</label>
+      <div class="field-row">
+       <input id="name" name="name" maxlength="24" minlength="2" placeholder="Diya" autocomplete="given-name" enterkeyhint="send" required aria-describedby="privacy form-status">
+       <button id="release" class="btn btn-primary" type="submit"><span>Launch lantern</span></button>
+      </div>
+      <p id="form-status" class="field-error" role="status" aria-live="polite"></p>
+      <p id="privacy" class="caption">Your name will be visible to everyone in this sky.</p>
+     </form>
     </div>
-    <p id="form-status" class="field-error" role="status" aria-live="polite"></p>
-    <p id="privacy" class="caption">Your name will be visible to everyone in this sky.</p>
-   </form>
+    <div id="launch-success" hidden role="status" aria-live="polite">
+     <h2 id="success-name">Your light is in the sky.</h2>
+     <p id="success-message" class="lead">One more wish. One brighter sky.</p>
+    </div>
+   </section>
   </div>
-  <div id="launch-success" hidden role="status" aria-live="polite">
-   <div class="success-art" aria-hidden="true"><img src="/resources/images/lantern.webp" width="600" height="657" alt=""></div>
-   <div class="success-content">
-    <p id="success-name" class="eyebrow"></p>
-    <h3 class="card-title">Your light is in the sky.</h3>
-    <p id="success-message" class="card-body">One more wish. One brighter sky.</p>
-   </div>
-  </div>
- </section>
- <footer id="share-panel" class="footer-bar" hidden>
-  <div id="sky-count" class="sky-count" role="status" aria-live="polite" aria-atomic="true" hidden>
-   <img src="/resources/images/lantern.webp" width="600" height="657" alt="" class="count-icon">
-   <span id="sky-count-copy"></span>
-  </div>
-  <button id="share" class="btn btn-secondary"><span>Pass on the light</span>{{icon:share-2}}</button>
-  <p id="share-status" class="sr-only" role="status" aria-live="polite"></p>
- </footer>
+  <footer id="share-panel" class="footer-bar" hidden>
+   <p id="sky-count" class="sky-count" role="status" aria-live="polite" aria-atomic="true" hidden><span id="sky-count-copy"></span></p>
+   <button id="share" class="btn btn-ghost">Pass on the light</button>
+   <p id="share-status" class="visually-hidden" role="status" aria-live="polite"></p>
+  </footer>
+ </div>
 </main>
 <audio id="music" src="/resources/audio/diwali-instrumental.mp3" preload="none" loop></audio>
 <dialog id="share-dialog" class="share-dialog" aria-labelledby="share-title" aria-describedby="share-description">
  <button id="close-share" class="icon-button share-close" aria-label="Close sharing options">{{icon:x}}</button>
- <p class="eyebrow">Share</p>
- <h2 id="share-title" class="card-title">Pass on the light</h2>
- <p id="share-description" class="card-body">Send a little Diwali magic to someone you love.</p>
+ <h2 id="share-title">Pass on the light</h2>
+ <p id="share-description" class="lead">Send a little Diwali magic to someone you love.</p>
  <div class="share-options">
-  <a id="share-whatsapp" class="share-option" target="_blank" rel="noopener noreferrer">{{icon:message-circle}}<span>WhatsApp</span></a>
-  <a id="share-telegram" class="share-option" target="_blank" rel="noopener noreferrer">{{icon:send}}<span>Telegram</span></a>
-  <a id="share-email" class="share-option">{{icon:mail}}<span>Email</span></a>
-  <button id="copy-share-link" class="share-option" type="button">{{icon:link}}<span>Copy link</span></button>
+  <a id="share-whatsapp" class="btn btn-ghost share-option" target="_blank" rel="noopener noreferrer">{{icon:message-circle}}<span>WhatsApp</span></a>
+  <a id="share-telegram" class="btn btn-ghost share-option" target="_blank" rel="noopener noreferrer">{{icon:send}}<span>Telegram</span></a>
+  <a id="share-email" class="btn btn-ghost share-option">{{icon:mail}}<span>Email</span></a>
+  <button id="copy-share-link" class="btn btn-ghost share-option" type="button">{{icon:link}}<span>Copy link</span></button>
  </div>
  <p id="copy-feedback" class="caption" role="status" aria-live="polite"></p>
 </dialog>

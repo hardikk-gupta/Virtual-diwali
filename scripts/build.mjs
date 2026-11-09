@@ -5,7 +5,10 @@ for (const dir of ['public/assets', 'public/resources/images', 'public/resources
 mkdirSync('dist/server', { recursive: true });
 mkdirSync('dist/.openai', { recursive: true });
 const html = readFileSync('web/index.html', 'utf8');
-const css = readFileSync('web/style.css', 'utf8');
+// Inline the Hallmark scaffold (tokens, then base) where style.css imports it, after the stamp.
+const css = readFileSync('web/style.css', 'utf8')
+  .replace('@import url("./tokens.css");', () => readFileSync('web/tokens.css', 'utf8'))
+  .replace('@import url("./base.css");', () => readFileSync('web/base.css', 'utf8'));
 const js = readFileSync('web/app.js', 'utf8');
 const page = html.replace(/\{\{icon:([a-z0-9-]+)\}\}/g, (_, name) =>
   readFileSync('resources/icons/' + name + '.svg', 'utf8').replace('<svg', '<svg class="icon" aria-hidden="true"')
@@ -13,7 +16,7 @@ const page = html.replace(/\{\{icon:([a-z0-9-]+)\}\}/g, (_, name) =>
 // Everything the page loads lives in resources/ and is served at the same path.
 const served = [
   'images/rooftop-sky.webp', 'images/rocket.webp', 'images/lantern.webp', 'images/diwali-share.jpg',
-  'fonts/outfit.woff2', 'fonts/manrope.woff2', 'fonts/playfair-display.woff2', 'fonts/playfair-display-italic.woff2',
+  'fonts/gloock.woff2', 'fonts/geist.woff2',
   'audio/diwali-instrumental.mp3'
 ];
 const assets = {};

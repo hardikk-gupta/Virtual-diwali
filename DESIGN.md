@@ -1,161 +1,128 @@
-# Diwali Sky — Design System
+# Diwali Sky: Design System
 
-A single immersive greeting: a rocket is lit on an Indian rooftop, the camera tilts up into the
-night sky, "Happy Diwali" forms out of sparks, and visitors' lanterns rise and drift away. The
-interface is deliberately small: one greeting, one action card, one footer. Everything else is sky.
+Built with [Hallmark](https://github.com/nutlope/hallmark) as a full redesign in its **Kiln**
+theme (atmospheric genre). This file is the locked system: later changes follow it.
 
-Process reference: [UI UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill).
-Its recommendations for this brief ("festive, immersive, premium") were adopted where they fit:
-a serif heading paired with a clean sans body ("Classic Elegant" pairing), SVG icons instead of
-emoji, slow motion ("avoid fast animations"), visible focus states, reduced-motion support, and
-checks at 375 / 768 / 1024 / 1440 px. Its default suggestion of liquid glass was **not** used:
-the panels are solid surfaces so text never depends on what is behind it.
-
----
+**The idea.** The sky is the page. One photograph (an Indian rooftop at dusk, extended upward with
+its own sky) fills the screen, visitors' named lanterns rise and recede into it, and every word
+sits on the centre axis at the poster's calm foot. There are no cards, no glass and no glow.
+Ember is the only accent, and it is used only as a fill.
 
 ## 1. Colour
 
-The night sky keeps the original midnight indigo and lilac text. Every control uses Diwali colours
-instead of purple: **marigold gold** (garlands, diya flames) for the main action and **sindoor
-maroon** with gold edges for secondary controls. Pink is kept only for the "Happy Diwali"
-lettering, to match the social preview image.
+All colours are tokens in `web/tokens.css` (Kiln) and the page block at the top of
+`web/style.css`. No colour literal appears outside them.
 
 | Token | Value | Use |
 |---|---|---|
-| `--night-0` | `#091028` | Page background; the exact zenith colour of the extended sky photo |
-| `--night-1` | `#10112D` | Input fields, dialog background |
-| `--surface` | `rgba(16,17,45,.94)` | Launch card (solid, no blur) |
-| `--marigold` → `--marigold-deep` | `#FFB43F` → `#F28C1C` | Primary button gradient ("Launch") |
-| `--marigold-light` | `#FFD27A` | Primary hover, focus ring, eyebrows, counter number |
-| `--on-marigold` | `#3B1405` | Text on the primary button |
-| `--maroon` / `--maroon-hover` | `#3A1212` / `#52191A` | Secondary buttons, icon buttons, share options, counter pill |
-| `--gold-line` | marigold at 35% | Borders of maroon controls; card top highlight |
-| `--gold-text` | `#FFE6BF` | Text on maroon; icons are marigold |
-| `--lilac-0` | `#F7F0FF` | Primary text |
-| `--lilac-1` | `#C7C9E3` | Secondary text (body copy, byline) |
-| `--lilac-2` | `#9FA2C8` | Tertiary text (captions, placeholders) |
-| `--line` / `--line-strong` | lilac at 12% / 25% | Hairline borders on the card and input |
-| `--danger` | `#FFB4C8` | Inline form errors |
+| `--color-sky` | `oklch(18% 0.06 268)` | Page background: the photographed sky's zenith, continued past the image |
+| `--color-paper` / `-2` / `-3` | `oklch(13% / 17.5% / 22% …40)` | Scrim base, input well, share dialog |
+| `--color-ink` | `oklch(94% 0.02 80)` | Cream: the title, headings, primary text |
+| `--color-ink-2` | `oklch(84% 0.025 70)` | Byline, lead text, labels |
+| `--color-muted` | `oklch(72% 0.03 60)` | Captions, placeholders, field and ghost-button edges |
+| `--color-accent` | `oklch(70% 0.2 45)` | Ember: the Launch button fill, your lantern's tag ring |
+| `--color-accent-ink` | `oklch(14% 0.02 40)` | Text on ember |
+| `--color-focus` | `oklch(76% 0.19 56)` | Focus ring, instant |
+| `--color-tag` / `--color-tag-ink` | warm paper / brown | The paper tag on each lantern (part of the photographed object) |
+| `--canvas-*` | hex twins | The same ink and ember colours for the canvas (title, sparks) |
 
-Contrast: on-marigold on marigold ≈ 9:1, gold-text on maroon ≈ 13:1, lilac-0 on surface ≈ 16:1,
-lilac-1 ≈ 10:1, lilac-2 ≈ 6.5:1. The scene (rooftop flames, red lanterns) keeps its
-photographic colours. Your own lantern's name tag gets a marigold ring.
+Rules: every letter stays cream, and ember never colours text. There are no gradients except two:
+Kiln's paper scrim under the poster's foot, and the top fade into the sky colour. There is no
+third hue.
 
-## 2. Typography
+## 2. Type
 
-Three families, each with one job. All are self-hosted as Latin-subset WOFF2 files (the
-Content-Security-Policy allows `'self'` only). Names in Devanagari and other scripts fall back to
-the system font.
+Two families, self-hosted as Latin-subset WOFF2 files (the security policy allows `'self'` only).
 
-| Role | Family | Weight | Size (desktop / phone) | Where |
-|---|---|---|---|---|
-| Display | **Outfit** | 800 (pink gradient) | fitted to the title box | "Happy Diwali" spark lettering (canvas) |
-| Heading | **Playfair Display** | 500–600 | intro 32–56px · card 26/32 · phone 21/26 | Intro line, card titles, dialog title |
-| Byline | **Playfair Display Italic** | 400 | 20/28 · phone 17/24 | "with love, Hardik" |
-| Eyebrow | **Manrope** | 700, uppercase, +0.22em | 12/16 · phone 11 | "Wishing you", "A light from …", "Share" |
-| Body | **Manrope** | 400 | 15/24 · phone 14/21 | Card descriptions |
-| Label | **Manrope** | 600 | 13/18 | Form label |
-| Input | **Manrope** | 500 | 16 (prevents iOS zoom) | Name field |
-| Button | **Manrope** | 700 | 15 primary · 14 secondary · 13 ghost | Launch, Share, Skip |
-| Caption | **Manrope** | 400 | 12/18 | Privacy note, copy feedback |
-| Counter | **Outfit** 700 + Manrope 500 | — | 18 + 12 | "55 lanterns in our sky" |
-| Lantern name | **Manrope** | 700 | 10–13, scales with the lantern | Paper tag on each lantern |
+| Role | Face | Size | Where |
+|---|---|---|---|
+| Title | **Gloock** 400, −0.015em | `clamp(3.25rem, 6.4vw + 1rem, 8.5rem)`, phones `clamp(2.75rem, 13vw, 3.5rem)` | "Happy Diwali", drawn by the spark canvas in solid cream |
+| Intro line | Gloock 400 | `--text-display` | "A little spark. A sky of wishes." (during the fuse) |
+| Heading | Gloock 400 | `--text-2xl` | Success line, share dialog title |
+| Wordmark | Gloock 400 | `--text-lg` (phones `--text-md`) | "A sky full of wishes" |
+| Figure | Gloock 400, tabular, −0.03em | `--text-3xl` (phones `--text-2xl`) | The lantern count |
+| Lead | **Geist** 400 | `--text-lead` (18–22px) | Byline, success message |
+| Body, buttons | Geist 500 | 16px | Launch lantern, Pass on the light |
+| Label, caption | Geist 500 / 400 | 14px, sentence case, no tracking | "Your name", the privacy note, "lanterns in our sky" |
+| Lantern tag | Geist 500 | 11–13px, scales with distance | Names on the lanterns |
 
-Rule of thumb: Outfit appears only where a number or the hero needs weight; Playfair is for
-headings and the byline; everything you interact with is Manrope.
+Kiln names Boska for display. Fontshare is blocked by this environment's network policy, so
+Gloock, the closest high-contrast serif on Hallmark's list, stands in. This is recorded in the CSS stamp.
 
-## 3. Spacing, shape and controls
+There are no eyebrows, no tracked capitals and no italic or accented words in headings.
 
-- 4-pt spacing scale: `4 · 8 · 12 · 16 · 20 · 24 · 32 · 40 · 48 · 64`.
-- Page gutter: `clamp(16px, 4vw, 40px)` plus safe-area insets.
-- Radii: 10 (small), 14 (controls), 20 (card, dialog).
-- Controls: primary/input height 52px (48px on phones); icon buttons and secondary buttons 44px.
-- Icons: Lucide, 18px, 2px stroke, inlined at build time.
-- Card: width 460px (full width on phones), padding 32px (24px on short screens, 20px on phones),
-  1px hairline border, a 1px marigold highlight along the top edge, layered drop shadow.
+## 3. Space, shape, controls
 
-## 4. Layout
+- Hallmark's 4-pt scale only: `--space-2xs` 4 · `xs` 8 · `sm` 12 · `md` 16 · `lg` 24 · `xl` 40 · `2xl` 64.
+- Container: 1440px cap with a 64px gutter (24px under 60rem, 16px under 40rem). At 1920 the
+  gutters grow and the measure doesn't.
+- Controls are pills, 50px tall (44px for small ones). The **ember pill** (`.btn-primary`) is the single
+  primary action. The **ghost pill** (`.btn-ghost`) has a 1px inset ring in `--color-muted` and is used
+  for every other button. Icon buttons are 44px ghost circles.
+- Each control has all eight states: default, hover, focus-visible (instant ring), active, disabled
+  (fill, ink, `cursor: not-allowed` and the attribute), loading ("Launching…"), error (inline
+  `#form-status`) and success (the form becomes the success line).
+- The input is a smoked well: `--color-paper-2` with a 1px `--color-muted` edge, 16px radius and a
+  constant border.
+- The share dialog is the only surface: `--color-paper-2`, 28px radius, a 1px rule and no shadow.
 
-The page has four fixed regions, top to bottom:
+## 4. Layout: a centred Poster
 
-1. **Top bar**: brand line on the left ("A sky full of wishes", hidden on phones); Skip / Replay / Sound on the right.
-2. **Greeting**: eyebrow → display title → byline, centred.
-3. **Open sky**: a flexible gap where lanterns are born and travel. Nothing in the interface sits here.
-4. **Action**: the launch card, centred and anchored to the bottom, then the **footer**: lantern
-   counter + "Pass on the light". On screens ≥ 1024px the footer items sit in the bottom-left and
-   bottom-right corners; below that they form a row under the card.
+1. **Top bar**, edge-aligned: the wordmark on the left; Skip intro, Replay and Sound on the right.
+2. **Open sky**: everything above the poster's foot belongs to the lanterns.
+3. **The poster's foot**, centred on one axis and anchored to the bottom: title → byline → name field
+   with the Launch lantern button → privacy note → a row with the count and "Pass on the light".
+4. A paper scrim at 72% rises behind the foot so the words sit on the dark side of the photograph.
 
-Special cases: landscape phones (height ≤ 500px) put the greeting on the left and the card on the
-right. On phones with the keyboard open, the card centres itself in the visible viewport and the
-greeting, top bar and footer step aside.
+Landscape phones hide the privacy note and tighten the gaps. With the keyboard open on a phone, the form
+moves into the visible space on a smoked well, and everything else steps aside.
 
-## 5. The sky
+## 5. Scene and motion
 
-- `resources/images/rooftop-sky.webp` is the original rooftop photograph extended upward by
-  1,024px of its own sky (see `scripts/extend-sky.py`). Each column continues the photo's top
-  colour, eases to the zenith navy `#091028`, and carries the same grain, so there is no visible
-  seam and no synthetic gradient.
-- The scene is sized from `--roof = max(100svh, 90vw)`: the full photo covers the viewport during
-  the intro. On wide screens the 90vw width also crops the side building out of frame.
-- After the rocket launches, the camera tilts up over 4.6s until only the lit parapet remains at
-  94% of the viewport height. The sky is the photo itself; the only overlay is a top fade into the
-  same `#091028`, so the edge of the image is never visible on very tall screens.
-- Faint twinkling stars appear only in the upper half, after the greeting forms.
+- `resources/images/rooftop-sky.webp` is the original photo extended upward with its own sky
+  (`scripts/extend-sky.py`). After the rocket launches, the camera tilts up over 4.6s until the lit
+  parapet sits at 94% of the screen.
+- **Lanterns** (engine in `web/app.js`):
+  - The sky starts empty and lanterns are born one at a time, anywhere in open sky, never behind
+    text or controls.
+  - Each one recedes toward a vanishing point just past the top edge, with a slight drift of its
+    own.
+  - It fades out at about half its size.
+  - No two lanterns ever overlap and no name appears twice at once.
+  - At most 16 on desktop, 12 on tablet, 7 on phone.
+  - Your lantern launches from the centre of the screen, above the interface, with an ember ring
+    on its tag.
+- Lanterns are photographs: no glow halos, no flicker, no stars. "Nothing pulses, flickers or glows" (Kiln).
+- **The title** forms once from ember sparks, then rests in solid cream. A ResizeObserver keeps it on
+  its box when the foot changes height.
+- Only `transform` and `opacity` animate. `prefers-reduced-motion` skips the intro, places the
+  lanterns still and removes every transition.
+- Without JavaScript the title is real text, and nothing is hidden behind a script (`.no-js` / `.js`).
 
-## 6. Lantern motion
-
-Lanterns are drawn by a small engine in `web/app.js`, not by CSS keyframes.
-
-- **Empty start.** The sky is empty when the greeting forms. Lanterns are then born one at a
-  time, about every 2–3.5s, until the sky holds 16 (desktop), 12 (tablet) or 7 (phone). After
-  that a new one is born whenever one leaves.
-- **Born in the sky.** Birth points are anywhere across the full width, above the rooftop
-  skyline, below the top bar, and never behind the greeting, card or footer. A lantern fades and
-  ignites over 4.5s; its glow flickers continuously.
-- **Moving forward, not just up.** Each lantern travels away from the viewer toward a
-  vanishing point just beyond the top edge of the screen (centre, −0.06 × viewport height), with
-  a small per-lantern drift (±18% of the width), like lanterns carried by slightly different
-  breezes. Its screen position is `VP + (birth − VP) / depth`, so the dominant motion is
-  shrinking into the distance, with a gentle rise and pull toward the centre. Depth eases in from
-  rest, so nothing starts fast, and screen speed falls further as the lantern recedes.
-- **Lost in the distance.** When a lantern has shrunk to about half its size it fades out over
-  roughly 12 seconds (fully gone at 40%), about a minute after birth, and a new lantern is born
-  to replace it. It never exits by sliding off the top,
-  and far-away lanterns never cluster around the vanishing point.
-- **No overlaps.** Before a lantern is born, its whole remaining flight is checked against every
-  lantern already in the sky, sampled every 1.5s. Any candidate that would touch another, label
-  included, is rejected. Among the valid candidates, the one farthest from its neighbours wins.
-- **No repeated names.** A name (case-insensitive) is never in the sky twice at once. Records
-  rotate, and new wishes from the 15s refresh are first in line.
-- **Readable greeting.** A lantern passing behind the greeting dims smoothly, by up to 62%, in
-  proportion to how much it overlaps.
-- **Your lantern.** After you press Launch, your lantern is born at the centre of the screen
-  *above* all interface layers. It is larger, its tag ringed in marigold, and slower. Its vanishing point
-  is straight above it, so it rises vertically and recedes. Any lantern whose path would cross it
-  fades out gracefully.
-- **Reduced motion.** The intro is skipped and lanterns are placed statically, without overlaps.
-
-## 7. Resources
-
-All shipped and source assets live in `resources/`. The build inlines them into the Sites
-worker and copies them into `public/` for Vercel at the same URL paths.
+## 6. Resources
 
 ```
 resources/
-  images/   rooftop-sky.webp (scene), lantern.webp, rocket.webp, diwali-share.jpg (OG image), kid.webp (unused)
-  fonts/    outfit.woff2, manrope.woff2, playfair-display(-italic).woff2 + OFL licences
-  audio/    diwali-instrumental.mp3
-  icons/    Lucide SVGs + licence (inlined into the HTML at build time)
-  source/   terrace-original.png (master photo), terrace.webp (previous crop)
+  images/  rooftop-sky.webp (scene), lantern.webp, rocket.webp, diwali-share.jpg (OG image), kid.webp (unused)
+  fonts/   gloock.woff2, geist.woff2 + OFL licences
+           outfit, manrope, playfair-display (no longer shipped; left for the owner to remove)
+  audio/   diwali-instrumental.mp3
+  icons/   Lucide SVGs + licence, inlined at build time
+  source/  terrace-original.png, terrace.webp
+web/
+  tokens.css, base.css  Hallmark scaffold (Kiln), inlined after the stamp by scripts/build.mjs
+  style.css             the stamp, the waivers on record, then the page
 ```
 
-`/assets/diwali-share.jpg` and `/assets/diwali-preview-2026.jpg` remain as aliases so existing
-social previews keep working.
+## 7. Checks
 
-## 8. Verification checklist
-
-- Phone 390×664, tablet 820×1180, desktop 1440×900, laptop 1366×768: no interface overlaps, no
-  horizontal scroll, lanterns never overlapping or duplicated (measured in the preview).
-- Keyboard: visible marigold focus ring on every control; the dialog uses native modal focus handling.
-- `prefers-reduced-motion` respected; sound is opt-in.
-- The database, API and lantern records are unchanged by this design.
+- Hallmark `sloplint`, static tier on the built page: **clean** (0 FAIL, 0 REFLEX, 0 WARN).
+- Render tier against the served page (`--url http://localhost:3000/`): **0 FAIL, 0 REFLEX**. The one
+  note (77, "one section") is dismissed on record: this is one screen by design.
+- Before the redesign: 38 FAIL, 8 REFLEX. The `--kept` check confirms every link, field and script
+  hook is kept. Changed and dropped words are listed in the stamp at the top of `web/style.css`.
+- Rendering `public/index.html` straight from disk reports the root-absolute `/resources/...` files as
+  missing. That's a property of reading from disk, not of the site.
+- Own checks from fresh browser windows at 1440, 1920, phone and landscape: no horizontal scroll, no
+  lantern overlaps, no page errors. API and Vercel tests pass.
+- `.hallmark/compare.html` (local only) shows the before and after side by side.
