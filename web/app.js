@@ -1,6 +1,9 @@
+document.documentElement.classList.replace('no-js','js');
 const $=s=>document.querySelector(s),body=document.body,reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 let introDone=false,audio=null,sound=false,poll=null;
-for(let i=0;i<42;i++){const el=document.createElement('i'),d=Math.random()*1.2+.6;el.className='star';el.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;width:${d}px;height:${d}px;animation-delay:${-Math.random()*6}s`;$('#stars').append(el)}
+// Canvas colours come from the page tokens (hex twins; see style.css).
+const token=name=>getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+const ink=token('--canvas-ink')||'#f2eadd',spark1=token('--canvas-spark-1')||'#fff9db',spark2=token('--canvas-spark-2')||'#ffcf66',spark3=token('--canvas-spark-3')||'#ff8a00';
 function tone(freq,duration,type='sine',gain=.035){if(!sound||!audio)return;const o=audio.createOscillator(),g=audio.createGain();o.type=type;o.frequency.setValueAtTime(freq,audio.currentTime);o.frequency.exponentialRampToValueAtTime(freq*.4,audio.currentTime+duration);g.gain.setValueAtTime(gain,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+duration);o.connect(g);g.connect(audio.destination);o.start();o.stop(audio.currentTime+duration)}
 $('#sound').addEventListener('click',async()=>{sound=!sound;const music=$('#music');try{if(sound){audio ||= new AudioContext();await audio.resume();music.volume=.32;await music.play();tone(350,.2)}else music.pause()}catch{sound=false;music.pause()}$('#sound .sound-on').hidden=!sound;$('#sound .sound-off').hidden=sound;$('#sound').setAttribute('aria-pressed',String(sound));const label=sound?'Turn music and sound off':'Turn music and sound on';$('#sound').setAttribute('aria-label',label);$('#sound').title=label});
 const canvas=$('#fireworks'),ctx=canvas.getContext('2d'),fuse=$('#fuse-track'),fuseBurn=$('#fuse-burn'),ember=$('#ember'),rocketImage=$('#rocket img');
@@ -10,25 +13,23 @@ function dimensions(){scale=Math.min(devicePixelRatio||1,innerWidth<600?1.5:2);c
 function makeTitle(){
  titleRect=$('#particle-title').getBoundingClientRect();
  const w=Math.ceil(titleRect.width),h=Math.ceil(titleRect.height),mask=document.createElement('canvas');mask.width=w;mask.height=h;
- const c=mask.getContext('2d',{willReadFrequently:true}),split=innerWidth<600,lines=split?['Happy','Diwali']:['Happy Diwali'],align='center',textX=w/2;
- let fontSize=lines.length===2?Math.min(86,w*.31,h*.46):Math.min(148,w*.14,h*.8);
- c.textAlign=align;c.textBaseline='middle';c.font=`800 ${fontSize}px Outfit, Arial, sans-serif`;
- while(Math.max(...lines.map(line=>c.measureText(line).width))>w*.92){fontSize-=1;c.font=`800 ${fontSize}px Outfit, Arial, sans-serif`}
- c.fillStyle='#fff';const linePositions=lines.map((line,i)=>({line,y:h/2+(i-(lines.length-1)/2)*fontSize*1.02}));
- for(const row of linePositions)c.fillText(row.line,textX,row.y);
+ const c=mask.getContext('2d',{willReadFrequently:true}),line='Happy Diwali';
+ let fontSize=parseFloat(getComputedStyle($('#particle-title')).fontSize)||96;
+ const face=size=>`400 ${size}px Gloock, Georgia, serif`;
+ c.textAlign='center';c.textBaseline='alphabetic';c.font=face(fontSize);
+ while(c.measureText(line).width>w*.98&&fontSize>24){fontSize-=1;c.font=face(fontSize)}
+ const baseline=h*.8;
+ c.fillStyle=ink;c.fillText(line,w/2,baseline);
  const pixels=c.getImageData(0,0,w,h).data;titlePoints=[];
  for(let i=0;i<9000&&titlePoints.length<520;i++){const x=Math.random()*w,y=Math.random()*h;if(pixels[(Math.floor(y)*w+Math.floor(x))*4+3]>200){const angle=Math.random()*Math.PI*2,speed=60+Math.random()*190;titlePoints.push({x,y,tx:titleRect.left+x,ty:titleRect.top+y,dx:Math.cos(angle)*speed,dy:Math.sin(angle)*speed,delay:Math.random()*.25,twinkle:Math.random()*6.28})}}
  titleCache=document.createElement('canvas');titleCache.width=Math.ceil(w*scale);titleCache.height=Math.ceil(h*scale);
- const cache=titleCache.getContext('2d');cache.scale(scale,scale);cache.textAlign=align;cache.textBaseline='middle';cache.font=c.font;
- const gold=cache.createLinearGradient(0,h*.15,0,h*.9);gold.addColorStop(0,'#ffe5fc');gold.addColorStop(.38,'#ffb7e7');gold.addColorStop(.68,'#f46acb');gold.addColorStop(1,'#bd36a4');
- cache.fillStyle=gold;cache.shadowColor='#eb5cce66';cache.shadowBlur=14;
- for(const row of linePositions)cache.fillText(row.line,textX,row.y);
- cache.shadowBlur=0;cache.strokeStyle='#ffe0fb66';cache.lineWidth=.5;for(const row of linePositions)cache.strokeText(row.line,textX,row.y);
+ const cache=titleCache.getContext('2d');cache.scale(scale,scale);cache.textAlign='center';cache.textBaseline='alphabetic';cache.font=c.font;
+ cache.fillStyle=ink;cache.fillText(line,w/2,baseline);
 }
 function sparkle(x,y,size,opacity=1){
- ctx.save();ctx.globalAlpha=Math.max(0,opacity);ctx.translate(x,y);ctx.shadowColor='#fb78de';ctx.shadowBlur=size*2;
- ctx.strokeStyle='#ffd4f6';ctx.lineWidth=.7;ctx.beginPath();ctx.moveTo(-size,0);ctx.lineTo(size,0);ctx.moveTo(0,-size*1.35);ctx.lineTo(0,size*1.35);ctx.stroke();
- ctx.strokeStyle='#fff2ff';ctx.lineWidth=.5;ctx.beginPath();ctx.moveTo(-size*.38,-size*.38);ctx.lineTo(size*.38,size*.38);ctx.moveTo(size*.38,-size*.38);ctx.lineTo(-size*.38,size*.38);ctx.stroke();ctx.restore();
+ ctx.save();ctx.globalAlpha=Math.max(0,opacity);ctx.translate(x,y);
+ ctx.strokeStyle=spark2;ctx.lineWidth=.7;ctx.beginPath();ctx.moveTo(-size,0);ctx.lineTo(size,0);ctx.moveTo(0,-size*1.35);ctx.lineTo(0,size*1.35);ctx.stroke();
+ ctx.strokeStyle=spark1;ctx.lineWidth=.5;ctx.beginPath();ctx.moveTo(-size*.38,-size*.38);ctx.lineTo(size*.38,size*.38);ctx.moveTo(size*.38,-size*.38);ctx.lineTo(-size*.38,size*.38);ctx.stroke();ctx.restore();
 }
 function clearFrame(){ctx.setTransform(scale,0,0,scale,0,0);ctx.clearRect(0,0,innerWidth,innerHeight)}
 function flyingRocket(progress){const p=Math.pow(progress,1.45),x0=launchRect.left+launchRect.width/2,y0=launchRect.top,x=x0,y=y0+(innerHeight*.28-y0)*p,k=1-.4*p,w=launchRect.width*k,h=launchRect.height*k;
@@ -38,19 +39,19 @@ function flyingRocket(progress){const p=Math.pow(progress,1.45),x0=launchRect.le
 function renderTitle(elapsed,now){
  const origin={x:innerWidth*.5,y:innerHeight*.28};
  if(elapsed>=2.95){
-  ctx.drawImage(titleCache,titleRect.left,titleRect.top,titleRect.width,titleRect.height);
-  if(!reduced&&titlePoints.length){for(let i=0;i<9;i++){const p=titlePoints[(Math.floor(now/1400)*13+i*59)%titlePoints.length],pulse=Math.pow(Math.max(0,Math.sin(now*.002+p.twinkle)),7);if(pulse>.05)sparkle(p.tx,p.ty,2.2+pulse*3.5,pulse*.9)}}return;
+  // Formed: the title rests in solid ink; nothing keeps twinkling.
+  ctx.drawImage(titleCache,titleRect.left,titleRect.top,titleRect.width,titleRect.height);return;
  }
  const fill=Math.max(0,Math.min(1,(elapsed-.9)/1.8));ctx.globalAlpha=ease(fill);ctx.drawImage(titleCache,titleRect.left,titleRect.top,titleRect.width,titleRect.height);ctx.globalAlpha=1;
  for(let i=0;i<titlePoints.length;i++){
   const p=titlePoints[i],scatter=Math.min(elapsed/.7,1),q=ease(Math.max(0,Math.min(1,(elapsed-.58-p.delay)/2.1))),sx=origin.x+p.dx*(1-Math.pow(1-scatter,2)),sy=origin.y+p.dy*(1-Math.pow(1-scatter,2)),x=sx+(p.tx-sx)*q,y=sy+(p.ty-sy)*q;
   const alpha=Math.min(1,elapsed*5)*(1-Math.max(0,(elapsed-2.3)/.65));if(alpha<=0)continue;
   const angle=Math.atan2(y-origin.y,x-origin.x),length=(1-q)*(7+Math.abs(p.dx)*.06)+2;
-  ctx.globalAlpha=alpha*.7;ctx.strokeStyle=i%3===0?'#fff1ff':'#ee90e1';ctx.lineWidth=i%4===0?1.2:.6;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-Math.cos(angle)*length,y-Math.sin(angle)*length);ctx.stroke();
+  ctx.globalAlpha=alpha*.7;ctx.strokeStyle=i%3===0?spark1:spark2;ctx.lineWidth=i%4===0?1.2:.6;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-Math.cos(angle)*length,y-Math.sin(angle)*length);ctx.stroke();
   if(i%19===0)sparkle(x,y,1.6+Math.sin(now*.008+p.twinkle)*1.1,alpha);
  }ctx.globalAlpha=1;
 }
-function drawEmbers(dt){embers=embers.filter(p=>p.life>0);ctx.strokeStyle='#ffd89a';ctx.lineWidth=.7;for(const p of embers){ctx.strokeStyle=p.color||'#ffd89a';p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=.018*dt;p.life-=.021*dt;ctx.globalAlpha=Math.max(0,p.life);ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x-p.vx*3,p.y-p.vy*3);ctx.stroke()}ctx.globalAlpha=1}
+function drawEmbers(dt){embers=embers.filter(p=>p.life>0);ctx.strokeStyle=spark2;ctx.lineWidth=.7;for(const p of embers){ctx.strokeStyle=p.color||spark2;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=.018*dt;p.life-=.021*dt;ctx.globalAlpha=Math.max(0,p.life);ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x-p.vx*3,p.y-p.vy*3);ctx.stroke()}ctx.globalAlpha=1}
 function reveal(){if(introDone)return;introDone=true;body.classList.add('formed','revealed');$('#intro-copy').hidden=true;$('#release-panel').hidden=false;$('#share-panel').hidden=false;$('#skip').hidden=true;$('#replay').hidden=false;requestAnimationFrame(()=>{dimensions();makeTitle();if(reduced){clearFrame();renderTitle(4,performance.now())}});startSky();refreshSky();if(!poll)poll=setInterval(()=>{if(!document.hidden&&introDone)refreshSky()},15000)}
 function frame(now){raf=requestAnimationFrame(frame);if(document.hidden||now-lastFrame<(phase==='formed'?32:14))return;const dt=Math.min((now-lastFrame)/16.67,2);lastFrame=now;clearFrame();const elapsed=now-started;
  if(phase==='fuse'){
@@ -118,7 +119,7 @@ function collidesInFlight(C,others,t,g){
 function makeLantern(record,opts={}){
  const compact=innerWidth<600,tablet=innerWidth<1024,mine=!!opts.mine||record.id===myId;
  const s0=opts.size||(compact?44+Math.random()*16:tablet?54+Math.random()*20:62+Math.random()*28);
- const fs=mine&&opts.size?Math.max(12,s0*.13):Math.max(10,Math.min(13,s0*.16));
+ const fs=mine&&opts.size?Math.max(13,s0*.13):Math.max(11,Math.min(13,s0*.16));
  return{id:record.id,name:record.name,key:normalName(record.name),mine,s0,fs,labelW:record.name.length*fs*.62+fs*1.4,
   x0:.5,y0:.5,born:sky.time,rate:opts.rate||(.022+Math.random()*.008),ease:opts.ease||6,phase:Math.random()*6.28,drift:opts.mine?0:(Math.random()-.5)*.36,el:null,dying:0};
 }
@@ -140,12 +141,11 @@ function findBirth(L,g){
 }
 function lanternElement(L){
  const el=document.createElement('div');el.className='lantern'+(L.mine?' mine':'');
- el.style.setProperty('--w',L.s0+'px');el.style.setProperty('--fs',L.fs+'px');el.style.setProperty('--flicker',(-Math.random()*3.2).toFixed(2)+'s');
+ el.style.setProperty('--w',L.s0+'px');el.style.setProperty('--fs',L.fs+'px');
  el.setAttribute('role','img');el.setAttribute('aria-label',L.name+'’s lantern');el.title=L.name+'’s Diwali wish';
- const glow=document.createElement('span');glow.className='lantern-glow';
  const img=document.createElement('img');img.src='/resources/images/lantern.webp';img.alt='';img.width=600;img.height=657;img.decoding='async';
  const tag=document.createElement('span');tag.className='lantern-name';tag.textContent=L.name;
- el.append(glow,img,tag);return el;
+ el.append(img,tag);return el;
 }
 let quiet=null;
 function quietZone(){const r=$('#greeting').getBoundingClientRect();return r.width?{l:r.left,r:r.right,t:r.top,b:r.bottom}:null}
@@ -225,6 +225,8 @@ function syncRecords(list){
  for(const L of sky.active)if(!ids.has(L.id)&&!L.dying)L.dying=sky.time;
  if(reduced&&sky.running&&fresh.length)layoutStill();
 }
+// The poster's foot changes height (form to success, errors); keep the drawn title on its box.
+if('ResizeObserver' in window)new ResizeObserver(()=>{if(!titleRect)return;const r=$('#particle-title').getBoundingClientRect();if(Math.abs(r.top-titleRect.top)<1&&Math.abs(r.width-titleRect.width)<1)return;makeTitle();if(reduced){clearFrame();renderTitle(4,performance.now())}}).observe($('.poster'));
 let resizeTimer;addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{dimensions();makeTitle();if(reduced){clearFrame();renderTitle(4,performance.now());layoutStill()}},150)});
 function updateSkyCount(total){
  if(!Number.isSafeInteger(total)||total<0){$('#sky-count').hidden=true;return}
@@ -236,10 +238,10 @@ function updateSkyCount(total){
 async function refreshSky(){try{const response=await fetch('/api/lanterns',{cache:'no-store'});const data=await response.json();if(!response.ok)throw Error(data.error||'The shared sky is unavailable.');syncRecords(data.lanterns);updateSkyCount(data.total)}catch{$('#sky-count').hidden=true}}
 function showLaunchSuccess(name,existing){
  $('#name').blur();const panel=$('#release-panel');panel.classList.add('success');$('#launch-success').hidden=false;
- $('#success-name').textContent='A light from '+name;
+ $('#success-name').textContent=name+', your light is in the sky.';
  $('#success-message').textContent=existing?'Your wish is still glowing. Here it is again.':'One more wish. One brighter sky.';
  $('#form-status').textContent='';
- if(!reduced){const x=innerWidth/2,y=innerHeight/2;for(let i=0;i<60;i++){const angle=Math.random()*Math.PI*2,speed=.8+Math.random()*2.4;embers.push({x,y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed-.6,life:.7+Math.random()*.6,size:1,color:i%3===0?'#fff0ff':'#f59cdd'})}if(phase==='formed'&&!raf)raf=requestAnimationFrame(frame)}
+ if(!reduced){const x=innerWidth/2,y=innerHeight/2;for(let i=0;i<60;i++){const angle=Math.random()*Math.PI*2,speed=.8+Math.random()*2.4;embers.push({x,y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed-.6,life:.7+Math.random()*.6,size:1,color:i%3===0?spark1:spark3})}if(phase==='formed'&&!raf)raf=requestAnimationFrame(frame)}
  tone(700,.4,'sine',.025);
 }
 $('#lantern-form').addEventListener('submit',async event=>{
@@ -249,7 +251,7 @@ $('#lantern-form').addEventListener('submit',async event=>{
  try{const response=await fetch('/api/lanterns',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:value,visitor})});const data=await response.json();if(!response.ok)throw Error(data.error||'Could not release your lantern. Please try again.');
  myId=data.lantern.id;sky.records.set(data.lantern.id,data.lantern);if(!sky.queue.includes(myId))sky.queue.push(myId);
  launchMine(data.lantern);$('#name').value=data.lantern.name;showLaunchSuccess(data.lantern.name,data.existing);await refreshSky();
- }catch(error){$('#form-status').textContent=error.message}finally{button.disabled=false;buttonText.textContent='Launch'}
+ }catch(error){$('#form-status').textContent=error.message}finally{button.disabled=false;buttonText.textContent='Launch lantern'}
 });
 const shareDialog=$('#share-dialog');
 function shareData(){return{title:'Happy Diwali!',text:'A little light, a lot of wishes. Happy Diwali! Come leave a lantern in our shared sky.',url:location.origin+'/diwali'}}
@@ -292,6 +294,6 @@ addEventListener('resize',scheduleKeyboardLayout);
 addEventListener('orientationchange',()=>{viewportBaseline=innerHeight;setTimeout(updateKeyboardLayout,200)});
 updateKeyboardLayout();
 
-Promise.all([document.fonts.load('800 80px Outfit'),document.fonts.load('500 16px Manrope'),document.fonts.load('600 24px "Playfair Display"'),rocketImage.decode().catch(()=>{}),new Promise(resolve=>{const image=new Image();image.onload=resolve;image.onerror=resolve;image.src='/resources/images/rooftop-sky.webp'})]).then(()=>{$('#loading').hidden=true;intro()});
+Promise.all([document.fonts.load('400 80px Gloock'),document.fonts.load('400 16px Geist'),rocketImage.decode().catch(()=>{}),new Promise(resolve=>{const image=new Image();image.onload=resolve;image.onerror=resolve;image.src='/resources/images/rooftop-sky.webp'})]).then(()=>{$('#loading').hidden=true;intro()});
 
 addEventListener('scroll',()=>{if(!titleRect)return;const next=$('#particle-title').getBoundingClientRect(),dx=next.left-titleRect.left,dy=next.top-titleRect.top;for(const point of titlePoints){point.tx+=dx;point.ty+=dy}titleRect=next;if(reduced&&introDone){clearFrame();renderTitle(4,performance.now())}},{passive:true});

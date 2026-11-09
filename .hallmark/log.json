@@ -1,0 +1,24 @@
+[
+ {
+  "mode": "redesign",
+  "depth": "full",
+  "scope": "page",
+  "shape": "photographic-one-screen",
+  "theme": "kiln",
+  "axes": "dark/high-contrast-serif/warm",
+  "hero": "poster-centred",
+  "nav": "edge-aligned",
+  "footer": "none",
+  "imagery": "photographs",
+  "photos": 0,
+  "entry": "intro-sequence",
+  "sections": [
+   "poster"
+  ],
+  "signature": "named lanterns receding into the photographed sky",
+  "waived": [],
+  "prompt": "a Diwali greeting where visitors launch a named sky lantern into a shared night sky over an Indian rooftop",
+  "fingerprint": "kiln-poster-centred",
+  "date": "2026-11-09"
+ }
+]
