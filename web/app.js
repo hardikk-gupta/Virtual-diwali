@@ -1,6 +1,6 @@
 const $=s=>document.querySelector(s),body=document.body,reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 let introDone=false,audio=null,sound=false,poll=null;
-for(let i=0;i<65;i++){const el=document.createElement('i');el.className='star';el.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*70}%;width:${Math.random()*1.3+.5}px;height:${Math.random()*1.3+.5}px;animation-delay:${Math.random()*6}s`;$('#stars').append(el)}
+for(let i=0;i<42;i++){const el=document.createElement('i'),d=Math.random()*1.2+.6;el.className='star';el.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;width:${d}px;height:${d}px;animation-delay:${-Math.random()*6}s`;$('#stars').append(el)}
 function tone(freq,duration,type='sine',gain=.035){if(!sound||!audio)return;const o=audio.createOscillator(),g=audio.createGain();o.type=type;o.frequency.setValueAtTime(freq,audio.currentTime);o.frequency.exponentialRampToValueAtTime(freq*.4,audio.currentTime+duration);g.gain.setValueAtTime(gain,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+duration);o.connect(g);g.connect(audio.destination);o.start();o.stop(audio.currentTime+duration)}
 $('#sound').addEventListener('click',async()=>{sound=!sound;const music=$('#music');try{if(sound){audio ||= new AudioContext();await audio.resume();music.volume=.32;await music.play();tone(350,.2)}else music.pause()}catch{sound=false;music.pause()}$('#sound .sound-on').hidden=!sound;$('#sound .sound-off').hidden=sound;$('#sound').setAttribute('aria-pressed',String(sound));const label=sound?'Turn music and sound off':'Turn music and sound on';$('#sound').setAttribute('aria-label',label);$('#sound').title=label});
 const canvas=$('#fireworks'),ctx=canvas.getContext('2d'),fuse=$('#fuse-track'),fuseBurn=$('#fuse-burn'),ember=$('#ember'),rocketImage=$('#rocket img');
@@ -51,7 +51,7 @@ function renderTitle(elapsed,now){
  }ctx.globalAlpha=1;
 }
 function drawEmbers(dt){embers=embers.filter(p=>p.life>0);ctx.strokeStyle='#ffd89a';ctx.lineWidth=.7;for(const p of embers){ctx.strokeStyle=p.color||'#ffd89a';p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=.018*dt;p.life-=.021*dt;ctx.globalAlpha=Math.max(0,p.life);ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x-p.vx*3,p.y-p.vy*3);ctx.stroke()}ctx.globalAlpha=1}
-function reveal(){if(introDone)return;introDone=true;body.classList.add('formed','revealed');$('#intro-copy').hidden=true;$('#release-panel').hidden=false;$('#share-panel').hidden=false;$('#skip').hidden=true;$('#replay').hidden=false;requestAnimationFrame(()=>{dimensions();makeTitle();if(reduced){clearFrame();renderTitle(4,performance.now())}});refreshSky();if(!poll)poll=setInterval(()=>{if(!document.hidden&&introDone)refreshSky()},15000)}
+function reveal(){if(introDone)return;introDone=true;body.classList.add('formed','revealed');$('#intro-copy').hidden=true;$('#release-panel').hidden=false;$('#share-panel').hidden=false;$('#skip').hidden=true;$('#replay').hidden=false;requestAnimationFrame(()=>{dimensions();makeTitle();if(reduced){clearFrame();renderTitle(4,performance.now())}});startSky();refreshSky();if(!poll)poll=setInterval(()=>{if(!document.hidden&&introDone)refreshSky()},15000)}
 function frame(now){raf=requestAnimationFrame(frame);if(document.hidden||now-lastFrame<(phase==='formed'?32:14))return;const dt=Math.min((now-lastFrame)/16.67,2);lastFrame=now;clearFrame();const elapsed=now-started;
  if(phase==='fuse'){
   const progress=Math.min(elapsed/3000,1),remaining=fuseLength*(1-progress),point=fuse.getPointAtLength(remaining);fuseBurn.style.strokeDasharray=`${remaining} ${fuseLength}`;ember.setAttribute('transform',`translate(${point.x},${point.y})`);const rect=$('#fuse-svg').getBoundingClientRect(),x=rect.left+point.x/400*rect.width,y=rect.top+point.y/800*rect.height;for(let i=0;i<2;i++)embers.push({x,y,vx:(Math.random()-.5)*2.2,vy:-Math.random()*2,life:.5+Math.random()*.5,size:Math.random()+.5});if(progress===1){launchRect=$('#rocket').getBoundingClientRect();body.classList.add('launched','zoomed');phase='flight';tone(700,1.2,'sawtooth',.018)}
@@ -61,59 +61,187 @@ function frame(now){raf=requestAnimationFrame(frame);if(document.hidden||now-las
   const age=phase==='formed'?4:(elapsed-4700)/1000;renderTitle(age,now);if(age>1.1)body.classList.add('formed');if(age>=2.95&&phase!=='formed'){phase='formed';reveal()}
  }drawEmbers(dt);
 }
-function intro(){if(raf)cancelAnimationFrame(raf);introDone=false;phase='fuse';body.className='';$('#greeting').hidden=false;$('#release-panel').hidden=true;$('#release-panel').classList.remove('success');$('#launch-success').hidden=true;$('#form-status').textContent='';$('#share-panel').hidden=true;$('#sky-count').hidden=true;$('#intro-copy').hidden=false;$('#skip').hidden=false;$('#replay').hidden=true;$('#rocket').style.visibility='';embers=[];fuseBurn.style.strokeDasharray=`${fuseLength} ${fuseLength}`;dimensions();makeTitle();started=performance.now();lastFrame=started;if(reduced){phase='formed';body.classList.add('launched','zoomed');reveal();clearFrame();renderTitle(4,started);return}raf=requestAnimationFrame(frame)}
+function intro(){if(raf)cancelAnimationFrame(raf);introDone=false;phase='fuse';body.className='';$('#greeting').hidden=false;$('#release-panel').hidden=true;$('#release-panel').classList.remove('success');$('#launch-success').hidden=true;$('#form-status').textContent='';$('#share-panel').hidden=true;$('#intro-copy').hidden=false;$('#skip').hidden=false;$('#replay').hidden=true;$('#rocket').style.visibility='';embers=[];stopSky();fuseBurn.style.strokeDasharray=`${fuseLength} ${fuseLength}`;dimensions();makeTitle();started=performance.now();lastFrame=started;if(reduced){phase='formed';body.classList.add('launched','zoomed');reveal();clearFrame();renderTitle(4,started);return}raf=requestAnimationFrame(frame)}
 $('#skip').addEventListener('click',()=>{phase='formed';body.classList.add('launched','zoomed');reveal();if(reduced){clearFrame();renderTitle(4,performance.now())}});$('#replay').addEventListener('click',intro);
-let resizeTimer;addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{dimensions();makeTitle();for(const node of $('#lanterns').children)positionLantern(node,hash(node.dataset.lanternId),Number(node.dataset.skySlot),node.classList.contains('mine'));if(reduced){clearFrame();renderTitle(4,performance.now())}},150)});
-let visitor;try{visitor=localStorage.getItem('diwali-visitor');if(!/^[a-f0-9-]{36}$/i.test(visitor||'')){visitor=crypto.randomUUID();localStorage.setItem('diwali-visitor',visitor)}}catch{visitor=crypto.randomUUID()}
-const visibleIds=new Set();let allLanterns=[],myId=null,skyReady=false;
-function hash(str){let n=0;for(const c of str)n=(n*31+c.charCodeAt(0))>>>0;return n}
-function positionLantern(el,seed,index,mine=false){
- const columns=innerWidth<600?4:7,rows=28/columns,slot=(index*11)%28;
- const random=n=>((Math.imul(seed^(n*374761393),668265263)>>>0)%1000)/1000;
- const compact=innerWidth<600,size=mine?(compact?58:84):(compact?30:42)+random(6)*(compact?16:26),duration=110+random(7)*40;
- const margin=Math.min(innerWidth*.18,110),x=margin+((slot%columns)+.2+random(1)*.6)/columns*(innerWidth-2*margin);
- const y=innerHeight*.625-size*.85;
- const endX=x+(innerWidth*.5-x)*.12,endY=-size;
- const age=(Math.floor(slot/columns)+.15+random(8)*.7)/rows;
- el.dataset.skySlot=String(index);
- el.style.cssText=`--start-x:${x}px;--start-y:${y}px;--end-x:${endX}px;--end-y:${endY}px;--size:${size}px;--duration:${duration}s;--delay:${mine?0:-age*duration}s;--rotation:${-3+random(9)*6}deg`;
 
+/* ===================== Lantern sky =====================
+   Each lantern is born inside open sky (never from the rooftop, never behind the
+   greeting or the card), ignites slowly, rises and recedes toward a vanishing point
+   that sits far above the top edge: we only ever see the lower part of the "V".
+   Screen position = VP + (birth - VP) / depth, so size and convergence come from one
+   perspective model. Births are chosen so no two lanterns overlap at any point of
+   their remaining flight, and a name is never in the sky twice at the same time. */
+let visitor;try{visitor=localStorage.getItem('diwali-visitor');if(!/^[a-f0-9-]{36}$/i.test(visitor||'')){visitor=crypto.randomUUID();localStorage.setItem('diwali-visitor',visitor)}}catch{visitor=crypto.randomUUID()}
+const skyLayer=$('#lanterns'),myLayer=$('#my-lantern-layer'),LANTERN_RATIO=657/600;
+const sky={running:false,raf:0,time:0,last:0,nextSpawn:0,spawned:0,active:[],records:new Map(),queue:[]};
+let myId=null;
+const normalName=name=>name.normalize('NFC').trim().toLocaleLowerCase();
+const smooth=x=>x<=0?0:x>=1?1:x*x*(3-2*x);
+function geometry(){
+ const w=innerWidth,h=innerHeight,roof=Math.max(h,w*.9),wall=h*.94;
+ return{w,h,vpx:w/2,vpy:-.8*h,skyline:wall-(.522-.3)*roof};
 }
-function addLantern(record,mine=false){
- if(visibleIds.has(record.id))return;
- const limit=innerWidth<600?14:28;if($('#lanterns').children.length>=limit){const old=$('#lanterns').firstElementChild;visibleIds.delete(old.dataset.lanternId);old.remove()}
- const occupied=new Set([...$('#lanterns').children].map(node=>Number(node.dataset.skySlot)));let slot=0;while(occupied.has(slot))slot++;
- visibleIds.add(record.id);
- const h=hash(record.id),el=document.createElement('div');
- el.className='lantern'+(mine?' mine':'');el.dataset.lanternId=record.id;
- el.setAttribute('role','img');el.setAttribute('aria-label',record.name+'’s lantern');el.title=record.name+'’s Diwali wish';
- positionLantern(el,h,slot,mine);
- const img=document.createElement('img');img.src='/assets/lantern.webp';img.alt='';img.width=600;img.height=657;
- const tag=document.createElement('span');tag.className='tag';tag.textContent=record.name;el.append(img,tag);$('#lanterns').append(el);
- if($('#lanterns').children.length>(innerWidth<600?14:28)){const first=$('#lanterns').firstElementChild;visibleIds.delete(first.dataset.lanternId);first.remove()}
+function maxActive(){return innerWidth<600?7:innerWidth<1024?12:16}
+function depth(L,t){const age=t-L.born;if(age<=0)return 1;return 1+L.rate*(age-L.ease*(1-Math.exp(-age/L.ease)))}
+function pose(L,t,g){
+ const z=depth(L,t),k=1/z,age=Math.max(0,t-L.born);
+ const x=g.vpx+(L.x0*g.w-g.vpx)*k+Math.sin(age*.21+L.phase)*5*k,y=g.vpy+(L.y0*g.h-g.vpy)*k;
+ return{x,y,k,rot:Math.sin(age*.27+L.phase)*2.4};
 }
+function box(L,p,pad=10){
+ const w=L.s0*p.k,h=w*LANTERN_RATIO,lw=Math.min(L.labelW,L.s0*2.2)*p.k,half=Math.max(w,lw)/2;
+ return{l:p.x-half-pad,r:p.x+half+pad,t:p.y-h/2-pad,b:p.y+h/2+L.fs*p.k*.9+pad};
+}
+const hit=(a,b)=>a.l<b.r&&a.r>b.l&&a.t<b.b&&a.b>b.t;
+const gone=(L,p)=>box(L,p,0).b<-4;
+function blocked(){
+ const out=[];
+ for(const sel of ['#greeting','#release-panel','.footer-bar','.controls','#intro-copy']){
+  const el=$(sel);if(!el||el.hidden||el.closest('[hidden]'))continue;
+  const r=el.getBoundingClientRect();if(r.width&&r.height)out.push({l:r.left-12,r:r.right+12,t:r.top-12,b:r.bottom+12});
+ }
+ return out;
+}
+function collidesInFlight(C,others,t,g){
+ for(const A of others){
+  for(let i=0;i<80;i++){
+   const at=t+i*1.5,pc=pose(C,at,g);if(gone(C,pc))break;
+   const pa=pose(A,at,g);if(gone(A,pa))break;
+   if(hit(box(C,pc),box(A,pa)))return true;
+  }
+ }
+ return false;
+}
+function makeLantern(record,opts={}){
+ const compact=innerWidth<600,tablet=innerWidth<1024,mine=!!opts.mine||record.id===myId;
+ const s0=opts.size||(compact?44+Math.random()*16:tablet?54+Math.random()*20:62+Math.random()*28);
+ const fs=mine&&opts.size?Math.max(12,s0*.13):Math.max(10,Math.min(13,s0*.16));
+ return{id:record.id,name:record.name,key:normalName(record.name),mine,s0,fs,labelW:record.name.length*fs*.62+fs*1.4,
+  x0:.5,y0:.5,born:sky.time,rate:opts.rate||(.0085+Math.random()*.003),ease:opts.ease||5,phase:Math.random()*6.28,el:null,dying:0};
+}
+function findBirth(L,g){
+ const zones=blocked(),top=Math.max(64,$('.topbar').getBoundingClientRect().bottom+8),bottom=g.skyline-12;
+ const others=[...sky.active.filter(a=>!a.dying),...(sky.mine?[sky.mine]:[])];let best=null,bestScore=-1;
+ for(let tries=0;tries<48;tries++){
+  const w=L.s0,h=w*LANTERN_RATIO+L.fs*.9,half=Math.max(w,Math.min(L.labelW,w*2.2))/2;
+  const minX=half+8,maxX=g.w-half-8,minY=top+h/2,maxY=bottom-h/2;if(maxX<=minX||maxY<=minY)return null;
+  const x=minX+Math.random()*(maxX-minX),y=minY+(maxY-minY)*Math.sqrt(Math.random());
+  L.x0=x/g.w;L.y0=y/g.h;const p=pose(L,L.born,g),b=box(L,p,0);
+  if(zones.some(z=>hit(b,z)))continue;
+  if(collidesInFlight(L,others,sky.time,g))continue;
+  let score=1e9;for(const o of others){const q=pose(o,sky.time,g);score=Math.min(score,Math.hypot(q.x-x,q.y-y))}
+  if(score>bestScore){bestScore=score;best={x0:L.x0,y0:L.y0}}
+  if(tries>10&&best)break;
+ }
+ if(!best)return null;L.x0=best.x0;L.y0=best.y0;return L;
+}
+function lanternElement(L){
+ const el=document.createElement('div');el.className='lantern'+(L.mine?' mine':'');
+ el.style.setProperty('--w',L.s0+'px');el.style.setProperty('--fs',L.fs+'px');el.style.setProperty('--flicker',(-Math.random()*3.2).toFixed(2)+'s');
+ el.setAttribute('role','img');el.setAttribute('aria-label',L.name+'’s lantern');el.title=L.name+'’s Diwali wish';
+ const glow=document.createElement('span');glow.className='lantern-glow';
+ const img=document.createElement('img');img.src='/resources/images/lantern.webp';img.alt='';img.width=600;img.height=657;img.decoding='async';
+ const tag=document.createElement('span');tag.className='lantern-name';tag.textContent=L.name;
+ el.append(glow,img,tag);return el;
+}
+let quiet=null;
+function quietZone(){const r=$('#greeting').getBoundingClientRect();return r.width?{l:r.left,r:r.right,t:r.top,b:r.bottom}:null}
+function render(L,g){
+ const p=pose(L,sky.time,g),age=sky.time-L.born;
+ let alpha=reduced?.9:smooth(age/4.5);
+ // Lanterns drifting behind the greeting soften so the words stay readable.
+ if(quiet&&!L.mine){const b=box(L,p,0),w=Math.max(0,Math.min(b.r,quiet.r)-Math.max(b.l,quiet.l)),h=Math.max(0,Math.min(b.b,quiet.b)-Math.max(b.t,quiet.t));alpha*=1-.62*smooth(w*h/((b.r-b.l)*(b.b-b.t))*1.6)}
+ if(L.dying)alpha*=1-smooth((sky.time-L.dying)/1.6);
+ L.el.style.opacity=alpha.toFixed(3);
+ L.el.style.transform=`translate3d(${(p.x-L.s0/2).toFixed(1)}px,${(p.y-L.s0*LANTERN_RATIO/2).toFixed(1)}px,0) rotate(${p.rot.toFixed(2)}deg) scale(${p.k.toFixed(4)})`;
+ return p;
+}
+function nextRecord(){
+ const inSky=new Set(sky.active.map(a=>a.key));if(sky.mine)inSky.add(sky.mine.key);
+ for(let i=0;i<sky.queue.length;i++){
+  const id=sky.queue[i],record=sky.records.get(id);if(!record)continue;
+  if(inSky.has(normalName(record.name))||(sky.mine&&record.id===sky.mine.id))continue;
+  sky.queue.splice(i,1);sky.queue.push(id);return record;
+ }
+ return null;
+}
+function spawn(g){
+ const record=nextRecord();if(!record)return false;
+ const L=findBirth(makeLantern(record),g);if(!L)return false;
+ L.el=lanternElement(L);skyLayer.append(L.el);sky.active.push(L);sky.spawned++;render(L,g);return true;
+}
+function tick(now){
+ sky.raf=requestAnimationFrame(tick);
+ const dt=Math.min(.1,Math.max(0,(now-sky.last)/1000));sky.last=now;if(document.hidden)return;sky.time+=dt;
+ const g=geometry();quiet=quietZone();
+ for(const L of [...sky.active,...(sky.mine?[sky.mine]:[])]){
+  const p=render(L,g);
+  if(gone(L,p)||(L.dying&&sky.time-L.dying>1.7)){L.el.remove();if(L===sky.mine)sky.mine=null;else sky.active.splice(sky.active.indexOf(L),1)}
+ }
+ if(sky.time>=sky.nextSpawn&&sky.active.length<maxActive()){
+  const ok=spawn(g);
+  sky.nextSpawn=sky.time+(ok?(sky.spawned<maxActive()?2+Math.random()*1.6:3+Math.random()*3):.8);
+ }
+}
+function startSky(){
+ if(sky.running)return;sky.running=true;sky.nextSpawn=sky.time+.6;
+ if(reduced){layoutStill();return}
+ sky.last=performance.now();sky.raf=requestAnimationFrame(tick);
+}
+function stopSky(){
+ sky.running=false;cancelAnimationFrame(sky.raf);
+ for(const L of sky.active)L.el.remove();if(sky.mine)sky.mine.el.remove();
+ sky.active=[];sky.mine=null;sky.spawned=0;
+}
+function layoutStill(){
+ if(!sky.running)return;const g=geometry();quiet=quietZone();
+ for(const L of sky.active)L.el.remove();sky.active=[];
+ for(let i=0;i<maxActive()*2&&sky.active.length<maxActive();i++)spawn(g);
+}
+function launchMine(record){
+ const g=geometry(),compact=innerWidth<600;
+ if(sky.mine)sky.mine.el.remove();
+ const L=makeLantern(record,{mine:true,size:compact?84:116,rate:.0065,ease:7});
+ L.x0=.5;L.y0=.5;L.born=sky.time;
+ for(const A of sky.active){if(A.dying)continue;if(A.key===L.key||A.id===L.id||collidesInFlight(L,[A],sky.time,g))A.dying=sky.time}
+ L.el=lanternElement(L);myLayer.append(L.el);sky.mine=L;render(L,g);
+ if(reduced){L.el.style.opacity='1'}
+ return L;
+}
+function syncRecords(list){
+ const fresh=[],ids=new Set();
+ for(const record of list){ids.add(record.id);if(!sky.records.has(record.id))fresh.push(record.id);sky.records.set(record.id,record)}
+ for(const id of [...sky.records.keys()])if(!ids.has(id))sky.records.delete(id);
+ sky.queue=sky.queue.filter(id=>ids.has(id));
+ // Newest wishes are first in line; the rest keep their rotation order.
+ sky.queue=[...fresh.filter(id=>!sky.queue.includes(id)),...sky.queue];
+ for(const L of sky.active)if(!ids.has(L.id)&&!L.dying)L.dying=sky.time;
+ if(reduced&&sky.running&&fresh.length)layoutStill();
+}
+let resizeTimer;addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{dimensions();makeTitle();if(reduced){clearFrame();renderTitle(4,performance.now());layoutStill()}},150)});
 function updateSkyCount(total){
  if(!Number.isSafeInteger(total)||total<0){$('#sky-count').hidden=true;return}
  const copy=$('#sky-count-copy');copy.replaceChildren();
  const number=document.createElement('strong');number.textContent=new Intl.NumberFormat('en-IN').format(total);
- const label=document.createElement('span');label.textContent=total===1?'lantern lighting our sky':'lanterns lighting our sky';
- copy.append(number,document.createTextNode(' '),label);$('#sky-count').hidden=false;
+ const label=document.createElement('span');label.className='count-label';label.textContent=total===1?'lantern in our sky':'lanterns in our sky';
+ copy.append(number,label);$('#sky-count').hidden=false;
 }
-async function refreshSky(){try{const response=await fetch('/api/lanterns',{cache:'no-store'});const data=await response.json();if(!response.ok)throw Error(data.error||'The shared sky is unavailable.');const selected=data.lanterns.slice(0,innerWidth<600?14:28),activeIds=new Set(selected.map(l=>l.id));for(const node of [...$('#lanterns').children])if(!activeIds.has(node.dataset.lanternId)){visibleIds.delete(node.dataset.lanternId);node.remove()}skyReady=true;allLanterns=data.lanterns;for(const record of selected)addLantern(record,record.id===myId);updateSkyCount(data.total)}catch{$('#sky-count').hidden=true;skyReady=false}}
+async function refreshSky(){try{const response=await fetch('/api/lanterns',{cache:'no-store'});const data=await response.json();if(!response.ok)throw Error(data.error||'The shared sky is unavailable.');syncRecords(data.lanterns);updateSkyCount(data.total)}catch{$('#sky-count').hidden=true}}
 function showLaunchSuccess(name,existing){
  $('#name').blur();const panel=$('#release-panel');panel.classList.add('success');$('#launch-success').hidden=false;
- $('#success-name').textContent='A LIGHT FROM '+name;
+ $('#success-name').textContent='A light from '+name;
  $('#success-message').textContent=existing?'Your wish is still glowing. Here it is again.':'One more wish. One brighter sky.';
  $('#form-status').textContent='';
- if(!reduced){const launched=$('#lanterns .mine'),rect=launched?.getBoundingClientRect(),x=rect?rect.left+rect.width/2:innerWidth*.18,y=rect?rect.top+rect.height/2:innerHeight*.6;for(let i=0;i<70;i++){const angle=Math.random()*Math.PI*2,speed=1+Math.random()*3;embers.push({x,y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed-.8,life:.7+Math.random()*.6,size:1,color:i%3===0?'#fff0ff':'#f59cdd'})}}
+ if(!reduced){const x=innerWidth/2,y=innerHeight/2;for(let i=0;i<60;i++){const angle=Math.random()*Math.PI*2,speed=.8+Math.random()*2.4;embers.push({x,y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed-.6,life:.7+Math.random()*.6,size:1,color:i%3===0?'#fff0ff':'#f59cdd'})}if(phase==='formed'&&!raf)raf=requestAnimationFrame(frame)}
  tone(700,.4,'sine',.025);
 }
 $('#lantern-form').addEventListener('submit',async event=>{
- event.preventDefault();const button=$('#release'),buttonText=button.querySelector('span');button.disabled=true;buttonText.textContent='Launching';$('#form-status').textContent='';
- try{const response=await fetch('/api/lanterns',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:$('#name').value,visitor})});const data=await response.json();if(!response.ok)throw Error(data.error||'Could not release your lantern. Please try again.');
- myId=data.lantern.id;
- if(visibleIds.has(myId)){const old=[...$('#lanterns').children].find(x=>x.dataset.lanternId===myId);if(old)old.remove();visibleIds.delete(myId)}
- addLantern(data.lantern,true);$('#name').value=data.lantern.name;showLaunchSuccess(data.lantern.name,data.existing);await refreshSky();
+ event.preventDefault();const button=$('#release'),buttonText=button.querySelector('span');
+ const value=$('#name').value.trim();if(value.length<2){$('#form-status').textContent='Please enter at least 2 letters.';$('#name').focus();return}
+ button.disabled=true;buttonText.textContent='Launching…';$('#form-status').textContent='';
+ try{const response=await fetch('/api/lanterns',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:value,visitor})});const data=await response.json();if(!response.ok)throw Error(data.error||'Could not release your lantern. Please try again.');
+ myId=data.lantern.id;sky.records.set(data.lantern.id,data.lantern);if(!sky.queue.includes(myId))sky.queue.push(myId);
+ launchMine(data.lantern);$('#name').value=data.lantern.name;showLaunchSuccess(data.lantern.name,data.existing);await refreshSky();
  }catch(error){$('#form-status').textContent=error.message}finally{button.disabled=false;buttonText.textContent='Launch'}
 });
 const shareDialog=$('#share-dialog');
@@ -157,6 +285,6 @@ addEventListener('resize',scheduleKeyboardLayout);
 addEventListener('orientationchange',()=>{viewportBaseline=innerHeight;setTimeout(updateKeyboardLayout,200)});
 updateKeyboardLayout();
 
-Promise.all([document.fonts.load('800 80px Outfit'),document.fonts.load('400 16px "Work Sans"'),rocketImage.decode().catch(()=>{}),new Promise(resolve=>{const image=new Image();image.onload=resolve;image.onerror=resolve;image.src='/assets/terrace.webp'})]).then(()=>{$('#loading').hidden=true;intro()});
+Promise.all([document.fonts.load('800 80px Outfit'),document.fonts.load('500 16px Manrope'),document.fonts.load('600 24px "Playfair Display"'),rocketImage.decode().catch(()=>{}),new Promise(resolve=>{const image=new Image();image.onload=resolve;image.onerror=resolve;image.src='/resources/images/rooftop-sky.webp'})]).then(()=>{$('#loading').hidden=true;intro()});
 
 addEventListener('scroll',()=>{if(!titleRect)return;const next=$('#particle-title').getBoundingClientRect(),dx=next.left-titleRect.left,dy=next.top-titleRect.top;for(const point of titlePoints){point.tx+=dx;point.ty+=dy}titleRect=next;if(reduced&&introDone){clearFrame();renderTitle(4,performance.now())}},{passive:true});
