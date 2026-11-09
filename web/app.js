@@ -79,13 +79,13 @@ const normalName=name=>name.normalize('NFC').trim().toLocaleLowerCase();
 const smooth=x=>x<=0?0:x>=1?1:x*x*(3-2*x);
 function geometry(){
  const w=innerWidth,h=innerHeight,roof=Math.max(h,w*.9),wall=h*.94;
- return{w,h,vpx:w/2,vpy:-.8*h,skyline:wall-(.522-.3)*roof};
+ return{w,h,vpx:w/2,vpy:-.06*h,skyline:wall-(.522-.3)*roof};
 }
 function maxActive(){return innerWidth<600?7:innerWidth<1024?12:16}
 function depth(L,t){const age=t-L.born;if(age<=0)return 1;return 1+L.rate*(age-L.ease*(1-Math.exp(-age/L.ease)))}
 function pose(L,t,g){
  const z=depth(L,t),k=1/z,age=Math.max(0,t-L.born);
- const x=g.vpx+(L.x0*g.w-g.vpx)*k+Math.sin(age*.21+L.phase)*5*k,y=g.vpy+(L.y0*g.h-g.vpy)*k;
+ const vx=g.vpx+L.drift*g.w,x=vx+(L.x0*g.w-vx)*k+Math.sin(age*.21+L.phase)*5*k,y=g.vpy+(L.y0*g.h-g.vpy)*k;
  return{x,y,k,rot:Math.sin(age*.27+L.phase)*2.4};
 }
 function box(L,p,pad=10){
@@ -93,7 +93,10 @@ function box(L,p,pad=10){
  return{l:p.x-half-pad,r:p.x+half+pad,t:p.y-h/2-pad,b:p.y+h/2+L.fs*p.k*.9+pad};
 }
 const hit=(a,b)=>a.l<b.r&&a.r>b.l&&a.t<b.b&&a.b>b.t;
-const gone=(L,p)=>box(L,p,0).b<-4;
+// Far away = small: a lantern fades out between depth scale .48 and .4 (about 12s), then is
+// gone, so distant lanterns never pile up near the vanishing point.
+const FAR=.4,FADING=.48,distanceFade=k=>smooth((k-FAR)/(FADING-FAR));
+const gone=(L,p)=>p.k<FAR||box(L,p,0).b<-4;
 function blocked(){
  const out=[];
  for(const sel of ['#greeting','#release-panel','.footer-bar','.controls','#intro-copy']){
@@ -105,8 +108,8 @@ function blocked(){
 function collidesInFlight(C,others,t,g){
  for(const A of others){
   for(let i=0;i<80;i++){
-   const at=t+i*1.5,pc=pose(C,at,g);if(gone(C,pc))break;
-   const pa=pose(A,at,g);if(gone(A,pa))break;
+   const at=t+i*1.5,pc=pose(C,at,g);if(gone(C,pc)||pc.k<FADING)break;
+   const pa=pose(A,at,g);if(gone(A,pa)||pa.k<FADING)break;
    if(hit(box(C,pc),box(A,pa)))return true;
   }
  }
@@ -117,7 +120,7 @@ function makeLantern(record,opts={}){
  const s0=opts.size||(compact?44+Math.random()*16:tablet?54+Math.random()*20:62+Math.random()*28);
  const fs=mine&&opts.size?Math.max(12,s0*.13):Math.max(10,Math.min(13,s0*.16));
  return{id:record.id,name:record.name,key:normalName(record.name),mine,s0,fs,labelW:record.name.length*fs*.62+fs*1.4,
-  x0:.5,y0:.5,born:sky.time,rate:opts.rate||(.0085+Math.random()*.003),ease:opts.ease||5,phase:Math.random()*6.28,el:null,dying:0};
+  x0:.5,y0:.5,born:sky.time,rate:opts.rate||(.022+Math.random()*.008),ease:opts.ease||6,phase:Math.random()*6.28,drift:opts.mine?0:(Math.random()-.5)*.36,el:null,dying:0};
 }
 function findBirth(L,g){
  const zones=blocked(),top=Math.max(64,$('.topbar').getBoundingClientRect().bottom+8),bottom=g.skyline-12;
@@ -148,7 +151,7 @@ let quiet=null;
 function quietZone(){const r=$('#greeting').getBoundingClientRect();return r.width?{l:r.left,r:r.right,t:r.top,b:r.bottom}:null}
 function render(L,g){
  const p=pose(L,sky.time,g),age=sky.time-L.born;
- let alpha=reduced?.9:smooth(age/4.5);
+ let alpha=reduced?.9:smooth(age/4.5)*distanceFade(p.k);
  // Lanterns drifting behind the greeting soften so the words stay readable.
  if(quiet&&!L.mine){const b=box(L,p,0),w=Math.max(0,Math.min(b.r,quiet.r)-Math.max(b.l,quiet.l)),h=Math.max(0,Math.min(b.b,quiet.b)-Math.max(b.t,quiet.t));alpha*=1-.62*smooth(w*h/((b.r-b.l)*(b.b-b.t))*1.6)}
  if(L.dying)alpha*=1-smooth((sky.time-L.dying)/1.6);
@@ -178,9 +181,13 @@ function tick(now){
   const p=render(L,g);
   if(gone(L,p)||(L.dying&&sky.time-L.dying>1.7)){L.el.remove();if(L===sky.mine)sky.mine=null;else sky.active.splice(sky.active.indexOf(L),1)}
  }
- if(sky.time>=sky.nextSpawn&&sky.active.length<maxActive()){
+ // Lanterns already fading into the distance no longer hold a place in the sky.
+ const lit=sky.active.filter(L=>!L.dying&&pose(L,sky.time,g).k>=FADING).length;
+ if(sky.time>=sky.nextSpawn&&lit<maxActive()&&sky.active.length<maxActive()+6){
   const ok=spawn(g);
-  sky.nextSpawn=sky.time+(ok?(sky.spawned<maxActive()?2+Math.random()*1.6:3+Math.random()*3):.8);
+  // Refill quickly whenever the sky is thin, so it never empties between waves.
+  const thin=lit<maxActive()*.7;
+  sky.nextSpawn=sky.time+(ok?(thin?1.6+Math.random()*1.2:2.8+Math.random()*2.4):.6);
  }
 }
 function startSky(){
@@ -201,7 +208,7 @@ function layoutStill(){
 function launchMine(record){
  const g=geometry(),compact=innerWidth<600;
  if(sky.mine)sky.mine.el.remove();
- const L=makeLantern(record,{mine:true,size:compact?84:116,rate:.0065,ease:7});
+ const L=makeLantern(record,{mine:true,size:compact?84:116,rate:.026,ease:8});
  L.x0=.5;L.y0=.5;L.born=sky.time;
  for(const A of sky.active){if(A.dying)continue;if(A.key===L.key||A.id===L.id||collidesInFlight(L,[A],sky.time,g))A.dying=sky.time}
  L.el=lanternElement(L);myLayer.append(L.el);sky.mine=L;render(L,g);

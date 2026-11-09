@@ -15,26 +15,31 @@ the panels are solid surfaces so text never depends on what is behind it.
 
 ## 1. Colour
 
-The palette is unchanged from the original site: midnight indigo, magenta and lilac.
+The night sky keeps the original midnight indigo and lilac text. Every control uses Diwali colours
+instead of purple: **marigold gold** (garlands, diya flames) for the main action and **sindoor
+maroon** with gold edges for secondary controls. Pink is kept only for the "Happy Diwali"
+lettering, to match the social preview image.
 
 | Token | Value | Use |
 |---|---|---|
 | `--night-0` | `#091028` | Page background; the exact zenith colour of the extended sky photo |
 | `--night-1` | `#10112D` | Input fields, dialog background |
-| `--night-2` | `#1B1B47` | Share options |
-| `--night-3` | `#2A2B5C` | Hover state for dark controls |
-| `--surface` | `rgba(16,17,45,.94)` | Card, footer pill, icon buttons (solid, no blur) |
-| `--magenta` | `#F08BD2` | Primary action, eyebrows, focus ring |
-| `--magenta-strong` | `#FFAEE6` | Primary hover |
-| `--on-magenta` | `#30102C` | Text on the primary button |
+| `--surface` | `rgba(16,17,45,.94)` | Launch card (solid, no blur) |
+| `--marigold` → `--marigold-deep` | `#FFB43F` → `#F28C1C` | Primary button gradient ("Launch") |
+| `--marigold-light` | `#FFD27A` | Primary hover, focus ring, eyebrows, counter number |
+| `--on-marigold` | `#3B1405` | Text on the primary button |
+| `--maroon` / `--maroon-hover` | `#3A1212` / `#52191A` | Secondary buttons, icon buttons, share options, counter pill |
+| `--gold-line` | marigold at 35% | Borders of maroon controls; card top highlight |
+| `--gold-text` | `#FFE6BF` | Text on maroon; icons are marigold |
 | `--lilac-0` | `#F7F0FF` | Primary text |
 | `--lilac-1` | `#C7C9E3` | Secondary text (body copy, byline) |
 | `--lilac-2` | `#9FA2C8` | Tertiary text (captions, placeholders) |
-| `--line` / `--line-strong` | lilac at 12% / 25% | Hairline borders |
+| `--line` / `--line-strong` | lilac at 12% / 25% | Hairline borders on the card and input |
 | `--danger` | `#FFB4C8` | Inline form errors |
 
-Contrast on `--surface`: lilac-0 ≈ 16:1, lilac-1 ≈ 10:1, lilac-2 ≈ 6.5:1, on-magenta on magenta ≈ 7.5:1.
-The scene (rooftop flames, red lanterns) keeps its photographic colours; they are not UI accents.
+Contrast: on-marigold on marigold ≈ 9:1, gold-text on maroon ≈ 13:1, lilac-0 on surface ≈ 16:1,
+lilac-1 ≈ 10:1, lilac-2 ≈ 6.5:1. The scene (rooftop flames, red lanterns) keeps its
+photographic colours. Your own lantern's name tag gets a marigold ring.
 
 ## 2. Typography
 
@@ -44,7 +49,7 @@ the system font.
 
 | Role | Family | Weight | Size (desktop / phone) | Where |
 |---|---|---|---|---|
-| Display | **Outfit** | 800 | fitted to the title box | "Happy Diwali" spark lettering (canvas) |
+| Display | **Outfit** | 800 (pink gradient) | fitted to the title box | "Happy Diwali" spark lettering (canvas) |
 | Heading | **Playfair Display** | 500–600 | intro 32–56px · card 26/32 · phone 21/26 | Intro line, card titles, dialog title |
 | Byline | **Playfair Display Italic** | 400 | 20/28 · phone 17/24 | "with love, Hardik" |
 | Eyebrow | **Manrope** | 700, uppercase, +0.22em | 12/16 · phone 11 | "Wishing you", "A light from …", "Share" |
@@ -67,7 +72,7 @@ headings and the byline; everything you interact with is Manrope.
 - Controls: primary/input height 52px (48px on phones); icon buttons and secondary buttons 44px.
 - Icons: Lucide, 18px, 2px stroke, inlined at build time.
 - Card: width 460px (full width on phones), padding 32px (24px on short screens, 20px on phones),
-  1px hairline border, a 1px magenta highlight along the top edge, layered drop shadow.
+  1px hairline border, a 1px marigold highlight along the top edge, layered drop shadow.
 
 ## 4. Layout
 
@@ -107,12 +112,16 @@ Lanterns are drawn by a small engine in `web/app.js`, not by CSS keyframes.
 - **Born in the sky.** Birth points are anywhere across the full width, above the rooftop
   skyline, below the top bar, and never behind the greeting, card or footer. A lantern fades and
   ignites over 4.5s; its glow flickers continuously.
-- **Perspective, not paths.** Each lantern recedes in depth toward a vanishing point at
-  (centre, −0.8 × viewport height), above and outside the screen. Its screen position is
-  `VP + (birth − VP) / depth`, so it rises, drifts toward the centre and shrinks together, like
-  the lower part of a "V" whose point we never see. Depth accelerates gently from rest, so
-  nothing ever starts fast. Typical speed is 7–12px per second, and a crossing takes about 1–2
-  minutes.
+- **Moving forward, not just up.** Each lantern travels away from the viewer toward a
+  vanishing point just beyond the top edge of the screen (centre, −0.06 × viewport height), with
+  a small per-lantern drift (±18% of the width), like lanterns carried by slightly different
+  breezes. Its screen position is `VP + (birth − VP) / depth`, so the dominant motion is
+  shrinking into the distance, with a gentle rise and pull toward the centre. Depth eases in from
+  rest, so nothing starts fast, and screen speed falls further as the lantern recedes.
+- **Lost in the distance.** When a lantern has shrunk to about half its size it fades out over
+  roughly 12 seconds (fully gone at 40%), about a minute after birth, and a new lantern is born
+  to replace it. It never exits by sliding off the top,
+  and far-away lanterns never cluster around the vanishing point.
 - **No overlaps.** Before a lantern is born, its whole remaining flight is checked against every
   lantern already in the sky, sampled every 1.5s. Any candidate that would touch another, label
   included, is rejected. Among the valid candidates, the one farthest from its neighbours wins.
@@ -121,7 +130,7 @@ Lanterns are drawn by a small engine in `web/app.js`, not by CSS keyframes.
 - **Readable greeting.** A lantern passing behind the greeting dims smoothly, by up to 62%, in
   proportion to how much it overlaps.
 - **Your lantern.** After you press Launch, your lantern is born at the centre of the screen
-  *above* all interface layers. It is larger, tagged in magenta, and slower. Its vanishing point
+  *above* all interface layers. It is larger, its tag ringed in marigold, and slower. Its vanishing point
   is straight above it, so it rises vertically and recedes. Any lantern whose path would cross it
   fades out gracefully.
 - **Reduced motion.** The intro is skipped and lanterns are placed statically, without overlaps.
@@ -147,6 +156,6 @@ social previews keep working.
 
 - Phone 390×664, tablet 820×1180, desktop 1440×900, laptop 1366×768: no interface overlaps, no
   horizontal scroll, lanterns never overlapping or duplicated (measured in the preview).
-- Keyboard: visible magenta focus ring on every control; the dialog uses native modal focus handling.
+- Keyboard: visible marigold focus ring on every control; the dialog uses native modal focus handling.
 - `prefers-reduced-motion` respected; sound is opt-in.
 - The database, API and lantern records are unchanged by this design.
