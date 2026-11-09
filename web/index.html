@@ -31,12 +31,12 @@
     <h1 id="particle-title" class="display"><span class="title-text">Happy Diwali</span></h1>
     <p id="byline" class="lead">Wishing you light, with love from Hardik.</p>
    </section>
-   <section id="release-panel" class="launch" hidden aria-label="Launch your lantern">
+   <section id="release-panel" class="launch" aria-label="Launch your lantern">
     <div class="launch-form-view">
      <form id="lantern-form" novalidate>
-      <label class="field-label" for="name">Your name</label>
+      <label class="visually-hidden" for="name">Your name</label>
       <div class="field-row">
-       <input id="name" name="name" maxlength="24" minlength="2" placeholder="Diya" autocomplete="given-name" enterkeyhint="send" required aria-describedby="privacy form-status">
+       <input id="name" name="name" maxlength="24" minlength="2" placeholder="Your name" autocomplete="given-name" enterkeyhint="send" required aria-describedby="privacy form-status">
        <button id="release" class="btn btn-primary" type="submit"><span>Launch lantern</span></button>
       </div>
       <p id="form-status" class="field-error" role="status" aria-live="polite"></p>
@@ -49,7 +49,7 @@
     </div>
    </section>
   </div>
-  <footer id="share-panel" class="footer-bar" hidden>
+  <footer id="share-panel" class="footer-bar">
    <p id="sky-count" class="sky-count" role="status" aria-live="polite" aria-atomic="true" hidden><span id="sky-count-copy"></span></p>
    <button id="share" class="btn btn-ghost">Pass on the light</button>
    <p id="share-status" class="visually-hidden" role="status" aria-live="polite"></p>
