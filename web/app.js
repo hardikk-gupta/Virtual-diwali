@@ -32,12 +32,14 @@ function sparkle(x,y,size,opacity=1){
  ctx.strokeStyle=spark1;ctx.lineWidth=.5;ctx.beginPath();ctx.moveTo(-size*.38,-size*.38);ctx.lineTo(size*.38,size*.38);ctx.moveTo(size*.38,-size*.38);ctx.lineTo(-size*.38,size*.38);ctx.stroke();ctx.restore();
 }
 function clearFrame(){ctx.setTransform(scale,0,0,scale,0,0);ctx.clearRect(0,0,innerWidth,innerHeight)}
-function flyingRocket(progress){const p=Math.pow(progress,1.45),x0=launchRect.left+launchRect.width/2,y0=launchRect.top,x=x0,y=y0+(innerHeight*.28-y0)*p,k=1-.4*p,w=launchRect.width*k,h=launchRect.height*k;
+// The shell climbs to the exact point where the title rests, slowing toward its apex, while the camera tilts up with it.
+const FLIGHT=3200,burstPoint=()=>({x:titleRect.left+titleRect.width/2,y:titleRect.top+titleRect.height*.55});
+function flyingRocket(progress){const p=1-Math.pow(1-progress,2.2),b=burstPoint(),x0=launchRect.left+launchRect.width/2,y0=launchRect.top,x=x0+(b.x-x0)*p,y=y0+(b.y-launchRect.height*.15-y0)*p,k=1-.45*p,w=launchRect.width*k,h=launchRect.height*k;
  ctx.save();ctx.translate(x,y);ctx.rotate(-.035*Math.sin(progress*Math.PI));const tail=ctx.createLinearGradient(0,h*.24,0,h*.65);tail.addColorStop(0,'#fff7b9');tail.addColorStop(.2,'#ffbd43');tail.addColorStop(1,'#ff7a1000');ctx.fillStyle=tail;ctx.beginPath();ctx.moveTo(-w*.025,h*.24);ctx.lineTo(w*.025,h*.24);ctx.lineTo((Math.random()-.5)*w*.08,h*(.5+Math.random()*.18));ctx.closePath();ctx.fill();ctx.drawImage(rocketImage,0,0,rocketImage.naturalWidth,rocketImage.naturalHeight*.5,-w/2,0,w,h*.5);ctx.restore();
  for(let i=0;i<4;i++)embers.push({x:x+(Math.random()-.5)*6,y:y+h*.27,vx:(Math.random()-.5)*.6,vy:.5+Math.random()*2,life:.7+Math.random()*.3,size:Math.random()*1.4+.4});
 }
 function renderTitle(elapsed,now){
- const origin={x:innerWidth*.5,y:innerHeight*.28};
+ const origin=burstPoint();
  if(elapsed>=2.95){
   // Formed: the title rests in solid ink; nothing keeps twinkling.
   ctx.drawImage(titleCache,titleRect.left,titleRect.top,titleRect.width,titleRect.height);return;
@@ -51,18 +53,20 @@ function renderTitle(elapsed,now){
   if(i%19===0)sparkle(x,y,1.6+Math.sin(now*.008+p.twinkle)*1.1,alpha);
  }ctx.globalAlpha=1;
 }
+// The shell bursts: a ring of ember sparks from the title's centre; the letters then gather in place.
+function burst(){if(reduced)return;const b=burstPoint();for(let i=0;i<110;i++){const angle=Math.random()*Math.PI*2,speed=1.6+Math.random()*4.2;embers.push({x:b.x,y:b.y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed-.4,life:.8+Math.random()*.6,size:1,color:i%4===0?spark1:i%4===1?spark3:spark2})}}
 function drawEmbers(dt){embers=embers.filter(p=>p.life>0);ctx.strokeStyle=spark2;ctx.lineWidth=.7;for(const p of embers){ctx.strokeStyle=p.color||spark2;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=.018*dt;p.life-=.021*dt;ctx.globalAlpha=Math.max(0,p.life);ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x-p.vx*3,p.y-p.vy*3);ctx.stroke()}ctx.globalAlpha=1}
-function reveal(){if(introDone)return;introDone=true;body.classList.add('formed','revealed');$('#intro-copy').hidden=true;$('#release-panel').hidden=false;$('#share-panel').hidden=false;$('#skip').hidden=true;$('#replay').hidden=false;requestAnimationFrame(()=>{dimensions();makeTitle();if(reduced){clearFrame();renderTitle(4,performance.now())}});startSky();refreshSky();if(!poll)poll=setInterval(()=>{if(!document.hidden&&introDone)refreshSky()},15000)}
+function reveal(){if(introDone)return;introDone=true;body.classList.add('formed','revealed');$('#intro-copy').hidden=true;$('#skip').hidden=true;$('#replay').hidden=false;requestAnimationFrame(()=>{dimensions();makeTitle();if(reduced){clearFrame();renderTitle(4,performance.now())}});startSky();refreshSky();if(!poll)poll=setInterval(()=>{if(!document.hidden&&introDone)refreshSky()},15000)}
 function frame(now){raf=requestAnimationFrame(frame);if(document.hidden||now-lastFrame<(phase==='formed'?32:14))return;const dt=Math.min((now-lastFrame)/16.67,2);lastFrame=now;clearFrame();const elapsed=now-started;
  if(phase==='fuse'){
   const progress=Math.min(elapsed/3000,1),remaining=fuseLength*(1-progress),point=fuse.getPointAtLength(remaining);fuseBurn.style.strokeDasharray=`${remaining} ${fuseLength}`;ember.setAttribute('transform',`translate(${point.x},${point.y})`);const rect=$('#fuse-svg').getBoundingClientRect(),x=rect.left+point.x/400*rect.width,y=rect.top+point.y/800*rect.height;for(let i=0;i<2;i++)embers.push({x,y,vx:(Math.random()-.5)*2.2,vy:-Math.random()*2,life:.5+Math.random()*.5,size:Math.random()+.5});if(progress===1){launchRect=$('#rocket').getBoundingClientRect();body.classList.add('launched','zoomed');phase='flight';tone(700,1.2,'sawtooth',.018)}
  }else if(phase==='flight'){
-  const progress=Math.min((elapsed-3000)/1700,1);flyingRocket(progress);if(progress===1){phase='forming';tone(70,.6,'triangle',.08)}
+  const progress=Math.min((elapsed-3000)/FLIGHT,1);flyingRocket(progress);if(progress===1){phase='forming';tone(70,.6,'triangle',.08);burst()}
  }else{
-  const age=phase==='formed'?4:(elapsed-4700)/1000;renderTitle(age,now);if(age>1.1)body.classList.add('formed');if(age>=2.95&&phase!=='formed'){phase='formed';reveal()}
+  const age=phase==='formed'?4:(elapsed-3000-FLIGHT)/1000;renderTitle(age,now);if(age>1.1)body.classList.add('formed');if(age>=2.95&&phase!=='formed'){phase='formed';reveal()}
  }drawEmbers(dt);
 }
-function intro(){if(raf)cancelAnimationFrame(raf);introDone=false;phase='fuse';body.className='';$('#greeting').hidden=false;$('#release-panel').hidden=true;$('#release-panel').classList.remove('success');$('#launch-success').hidden=true;$('#form-status').textContent='';$('#share-panel').hidden=true;$('#intro-copy').hidden=false;$('#skip').hidden=false;$('#replay').hidden=true;$('#rocket').style.visibility='';embers=[];stopSky();fuseBurn.style.strokeDasharray=`${fuseLength} ${fuseLength}`;dimensions();makeTitle();started=performance.now();lastFrame=started;if(reduced){phase='formed';body.classList.add('launched','zoomed');reveal();clearFrame();renderTitle(4,started);return}raf=requestAnimationFrame(frame)}
+function intro(){if(raf)cancelAnimationFrame(raf);introDone=false;phase='fuse';body.className='';$('#greeting').hidden=false;$('#release-panel').classList.remove('success');$('#launch-success').hidden=true;$('#form-status').textContent='';$('#intro-copy').hidden=false;$('#skip').hidden=false;$('#replay').hidden=true;$('#rocket').style.visibility='';embers=[];stopSky();fuseBurn.style.strokeDasharray=`${fuseLength} ${fuseLength}`;dimensions();makeTitle();started=performance.now();lastFrame=started;if(reduced){phase='formed';body.classList.add('launched','zoomed');reveal();clearFrame();renderTitle(4,started);return}raf=requestAnimationFrame(frame)}
 $('#skip').addEventListener('click',()=>{phase='formed';body.classList.add('launched','zoomed');reveal();if(reduced){clearFrame();renderTitle(4,performance.now())}});$('#replay').addEventListener('click',intro);
 
 /* ===================== Lantern sky =====================

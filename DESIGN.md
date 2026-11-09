@@ -43,7 +43,8 @@ Two families, self-hosted as Latin-subset WOFF2 files (the security policy allow
 | Figure | Gloock 400, tabular, −0.03em | `--text-3xl` (phones `--text-2xl`) | The lantern count |
 | Lead | **Geist** 400 | `--text-lead` (18–22px) | Byline, success message |
 | Body, buttons | Geist 500 | 16px | Launch lantern, Pass on the light |
-| Label, caption | Geist 500 / 400 | 14px, sentence case, no tracking | "Your name", the privacy note, "lanterns in our sky" |
+| Placeholder | Geist 400, faded | 16px | "Your name", inside the field |
+| Caption | Geist 400 / 500 | 14px, sentence case, no tracking | The privacy note, "lanterns in our sky" |
 | Lantern tag | Geist 500 | 11–13px, scales with distance | Names on the lanterns |
 
 Kiln names Boska for display. Fontshare is blocked by this environment's network policy, so
@@ -63,7 +64,8 @@ There are no eyebrows, no tracked capitals and no italic or accented words in he
   (fill, ink, `cursor: not-allowed` and the attribute), loading ("Launching…"), error (inline
   `#form-status`) and success (the form becomes the success line).
 - The input is a smoked well: `--color-paper-2` with a 1px `--color-muted` edge, 16px radius and a
-  constant border.
+  constant border. "Your name" sits inside it as the placeholder, in Geist and faded
+  (`--color-placeholder`, muted at 72%). A visually hidden `<label>` keeps the name for screen readers.
 - The share dialog is the only surface: `--color-paper-2`, 28px radius, a 1px rule and no shadow.
 
 ## 4. Layout: a centred Poster
@@ -72,6 +74,8 @@ There are no eyebrows, no tracked capitals and no italic or accented words in he
 2. **Open sky**: everything above the poster's foot belongs to the lanterns.
 3. **The poster's foot**, centred on one axis and anchored to the bottom: title → byline → name field
    with the Launch lantern button → privacy note → a row with the count and "Pass on the light".
+   The byline, form and footer hold their space through the intro, so the title's position never
+   changes.
 4. A paper scrim at 72% rises behind the foot so the words sit on the dark side of the photograph.
 
 Landscape phones hide the privacy note and tighten the gaps. With the keyboard open on a phone, the form
@@ -80,8 +84,15 @@ moves into the visible space on a smoked well, and everything else steps aside.
 ## 5. Scene and motion
 
 - `resources/images/rooftop-sky.webp` is the original photo extended upward with its own sky
-  (`scripts/extend-sky.py`). After the rocket launches, the camera tilts up over 4.6s until the lit
-  parapet sits at 94% of the screen.
+  (`scripts/extend-sky.py`).
+- **The intro, one shot:**
+  1. The fuse burns for 3s.
+  2. The shell lifts off and the camera tilts up with it. Both take 3.2s (`--dur-camera` in CSS,
+     `FLIGHT` in `app.js`), so the camera follows the shell into the sky rather than starting late.
+  3. The shell decelerates toward its apex, which is the exact centre of the "Happy Diwali" box, and
+     bursts there in a ring of ember sparks.
+  4. The sparks gather into the letters in place: the title never travels. Once it has formed, the
+     byline, the form and the footer fade in 250ms apart, with opacity only and nothing sliding.
 - **Lanterns** (engine in `web/app.js`):
   - The sky starts empty and lanterns are born one at a time, anywhere in open sky, never behind
     text or controls.
@@ -93,8 +104,8 @@ moves into the visible space on a smoked well, and everything else steps aside.
   - Your lantern launches from the centre of the screen, above the interface, with an ember ring
     on its tag.
 - Lanterns are photographs: no glow halos, no flicker, no stars. "Nothing pulses, flickers or glows" (Kiln).
-- **The title** forms once from ember sparks, then rests in solid cream. A ResizeObserver keeps it on
-  its box when the foot changes height.
+- **The title** forms once from ember sparks at the burst point, then rests in solid cream. A
+  ResizeObserver keeps it on its box when the foot changes height (for example, form to success).
 - Only `transform` and `opacity` animate. `prefers-reduced-motion` skips the intro, places the
   lanterns still and removes every transition.
 - Without JavaScript the title is real text, and nothing is hidden behind a script (`.no-js` / `.js`).

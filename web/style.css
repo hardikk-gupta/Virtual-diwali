@@ -43,6 +43,9 @@
   --canvas-spark-3: #ff8a00;
   --canvas-flame: #e13b00;
 
+  --dur-camera: 3.2s; /* equals FLIGHT in app.js: the camera follows the shell up */
+  --dur-reveal: 900ms;
+  --color-placeholder: color-mix(in oklab, var(--color-muted) 72%, transparent);
   --control: 50px;
   --control-small: 44px;
   --icon: 18px;
@@ -57,7 +60,6 @@ button { cursor: pointer; touch-action: manipulation; color: inherit; }
 .icon { width: var(--icon); height: var(--icon); flex: none; stroke-width: 2; }
 .lead { color: var(--color-ink-2); }
 .caption { font-size: var(--text-sm); line-height: 1.45; color: var(--color-muted); }
-.field-label { display: block; margin-block-end: var(--space-xs); font-size: var(--text-sm); font-weight: 500; color: var(--color-ink-2); }
 .field-error { font-size: var(--text-sm); font-weight: 500; color: var(--color-error); }
 .field-error:not(:empty) { margin-block-start: var(--space-xs); }
 
@@ -79,7 +81,7 @@ button { cursor: pointer; touch-action: manipulation; color: inherit; }
 
 /* ---------- The scene: one photograph, extended upward with its own sky ---------- */
 #world { position: fixed; inset: 0; overflow: hidden; background: var(--color-sky); }
-#camera { position: absolute; inset: 0; transform: scale(1.06); transform-origin: 50% 100%; transition: transform 4.6s var(--ease-in-out); }
+#camera { position: absolute; inset: 0; transform: scale(1.06); transform-origin: 50% 100%; transition: transform var(--dur-camera) var(--ease-in-out); }
 /* After launch the camera tilts up until only the lit parapet stays in frame, at 94% of the screen. */
 .zoomed #camera { transform: translateY(calc(var(--roof) * 0.478 - 6svh)) scale(1); }
 #scene { position: absolute; left: 50%; bottom: 0; width: calc(var(--roof) * 1.5); height: calc(var(--roof) * 2); transform: translateX(-50%); background: url("/resources/images/rooftop-sky.webp") center bottom / 100% 100% no-repeat; }
@@ -132,7 +134,7 @@ button { cursor: pointer; touch-action: manipulation; color: inherit; }
 .launch { width: 100%; max-width: 34rem; }
 .field-row { display: flex; gap: var(--space-xs); }
 #name { flex: 1; min-width: 0; height: var(--control); padding-inline: var(--space-md); border: var(--rule-hair) solid var(--color-muted); border-radius: var(--radius-well); background: var(--color-paper-2); font-size: var(--text-md); color: var(--color-ink); }
-#name::placeholder { color: var(--color-muted); }
+#name::placeholder { color: var(--color-placeholder); font-family: var(--font-body); font-weight: 400; opacity: 1; }
 #name:hover { background: var(--color-paper-3); }
 #name:focus { outline: 2px solid var(--color-focus); outline-offset: 3px; }
 #name:disabled { cursor: not-allowed; opacity: 0.6; }
@@ -145,10 +147,14 @@ button { cursor: pointer; touch-action: manipulation; color: inherit; }
 #sky-count-copy { display: inline-flex; align-items: baseline; gap: var(--space-xs); }
 #sky-count-copy strong { font-family: var(--font-display); font-weight: var(--display-weight); font-size: var(--text-3xl); line-height: 1; letter-spacing: -0.03em; font-variant-numeric: lining-nums tabular-nums; color: var(--color-ink); }
 
-/* Reveal: visible by default; only a running script holds the byline back until the sparks form. */
-.js #byline { opacity: 0; transition: opacity var(--dur-long) var(--ease-out); }
-.js .revealed #byline { opacity: 1; }
-.js .launch, .js .footer-bar { animation: settle var(--dur-long) var(--ease-out) both; }
+/* Reveal: visible by default. With the script running, the byline, the form and the footer hold
+   their place through the intro (so the title never moves) and fade in, one after another, once
+   the sparks have formed the title. Opacity only: nothing slides. */
+.no-js #release-panel, .no-js #share-panel { display: none; }
+.js #byline, .js .launch, .js .footer-bar { opacity: 0; visibility: hidden; transition: opacity var(--dur-reveal) var(--ease-out), visibility 0s linear var(--dur-reveal); }
+.js .revealed #byline, .js .revealed .launch, .js .revealed .footer-bar { opacity: 1; visibility: visible; transition: opacity var(--dur-reveal) var(--ease-out), visibility 0s; }
+.js .revealed .launch { transition-delay: 250ms; }
+.js .revealed .footer-bar { transition-delay: 500ms; }
 .js #intro-copy { transition: opacity 0.8s var(--ease-out); }
 .js .launched #intro-copy { opacity: 0; }
 
@@ -181,16 +187,13 @@ button { cursor: pointer; touch-action: manipulation; color: inherit; }
   .poster, .poster-main { gap: var(--space-sm); }
   .greeting { gap: var(--space-2xs); }
   #privacy { display: none; }
-  .field-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 }
 
 /* ---------- Keyboard open on phones: the form owns the visible space ---------- */
 .keyboard-active .greeting, .keyboard-active .footer-bar, .keyboard-active .topbar { opacity: 0; pointer-events: none; }
 .keyboard-active .launch { position: fixed; inset-inline: var(--gutter); inset-block-start: calc(var(--visual-top, 0px) + var(--visual-height, 100svh) / 2); transform: translateY(-50%); max-width: none; padding: var(--space-lg); border: var(--rule-hair) solid var(--color-rule); border-radius: var(--radius-card); background: var(--color-paper-2); animation: none; z-index: var(--z-modal); }
 
-@keyframes settle { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) {
   #camera, .scrim, #bottle, .js #intro-copy { transition: none; }
-  .js .launch, .js .footer-bar { animation: none; }
-  .js #byline { transition: none; }
+  .js #byline, .js .launch, .js .footer-bar { transition: none; }
 }
