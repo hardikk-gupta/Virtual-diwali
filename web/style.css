@@ -46,10 +46,11 @@
   --dur-camera: 3.2s; /* equals FLIGHT in app.js: the camera follows the shell up */
   --dur-reveal: 900ms;
   --color-placeholder: color-mix(in oklab, var(--color-muted) 72%, transparent);
+  --lift: 18svh; /* space under the poster's foot */
   --control: 50px;
   --control-small: 44px;
   --icon: 18px;
-  --title-size: clamp(3.25rem, 6.4vw + 1rem, 8.5rem);
+  --title-size: min(clamp(3.25rem, 6.4vw + 1rem, 8.5rem), 15svh);
   --roof: max(100svh, 90vw);
 }
 
@@ -87,7 +88,7 @@ button { cursor: pointer; touch-action: manipulation; color: inherit; }
 #scene { position: absolute; left: 50%; bottom: 0; width: calc(var(--roof) * 1.5); height: calc(var(--roof) * 2); transform: translateX(-50%); background: url("/resources/images/rooftop-sky.webp") center bottom / 100% 100% no-repeat; }
 #world::before { content: ""; position: absolute; inset: 0 0 auto; height: 22svh; z-index: var(--z-base); pointer-events: none; background: linear-gradient(var(--color-sky), var(--color-sky-fade)); }
 /* Kiln's scrim: the paper at 72% under the poster's foot, so the words sit on the dark side of the photograph. */
-.scrim { position: absolute; inset: auto 0 0; height: 62svh; z-index: 3; pointer-events: none; background: linear-gradient(to top, var(--color-scrim), var(--color-scrim-soft)); opacity: 0; transition: opacity 2s var(--ease-out); }
+.scrim { position: absolute; inset: auto 0 0; height: 62svh; z-index: 2; pointer-events: none; background: linear-gradient(to top, var(--color-scrim), var(--color-scrim-soft)); opacity: 0; transition: opacity 2s var(--ease-out); }
 .formed .scrim { opacity: 1; }
 #bottle, #rocket { position: absolute; bottom: 5svh; left: calc(50% - 6svh); width: 12svh; height: 24svh; }
 #bottle img, #rocket img { width: 100%; height: 100%; object-fit: contain; }
@@ -102,7 +103,7 @@ button { cursor: pointer; touch-action: manipulation; color: inherit; }
 #fireworks { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 4; pointer-events: none; }
 
 /* ---------- Lanterns: photographs, placed and moved by app.js ---------- */
-#lanterns, #my-lantern-layer { position: absolute; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+#lanterns, #my-lantern-layer { position: absolute; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
 #my-lantern-layer { position: fixed; z-index: var(--z-sticky); }
 .lantern { position: absolute; left: 0; top: 0; width: var(--w, 64px); aspect-ratio: 600 / 657; opacity: 0; will-change: transform, opacity; contain: layout style; }
 .lantern img { display: block; width: 100%; height: 100%; object-fit: contain; }
@@ -121,7 +122,9 @@ button { cursor: pointer; touch-action: manipulation; color: inherit; }
 .loading-ember { width: 8px; height: 8px; border-radius: 50%; background: var(--color-accent); }
 
 /* ---------- The poster: sky above, every word on its calm foot ---------- */
-#stage { position: relative; z-index: var(--z-raised); display: flex; flex-direction: column; min-height: 100svh; padding-block: calc(72px + env(safe-area-inset-top)) max(var(--space-2xl), env(safe-area-inset-bottom)); pointer-events: none; }
+/* The foot is lifted off the bottom edge: the block rests a little above the screen's middle, so the
+   shell bursts (and the title forms) in open sky, clear of the rooftops. */
+#stage { position: relative; z-index: var(--z-raised); display: flex; flex-direction: column; min-height: 100svh; padding-block: calc(72px + env(safe-area-inset-top)) max(var(--lift), env(safe-area-inset-bottom)); pointer-events: none; }
 #stage > *, .poster > *, .poster-main > * { pointer-events: auto; }
 #intro-copy { position: absolute; inset-block-start: 22svh; inset-inline: var(--gutter); display: flex; justify-content: center; text-align: center; }
 .intro-line { max-width: 14ch; font-family: var(--font-display); font-size: var(--text-display); line-height: 1.04; letter-spacing: var(--tracking-display); color: var(--color-ink); text-wrap: balance; }
@@ -170,10 +173,10 @@ button { cursor: pointer; touch-action: manipulation; color: inherit; }
 
 /* ---------- Narrow screens: one column, the poster's foot stacks ---------- */
 @media (max-width: 60rem) {
-  #stage { padding-block-end: max(var(--space-lg), env(safe-area-inset-bottom)); }
+  :root { --lift: 14svh; }
 }
 @media (max-width: 40rem) {
-  :root { --title-size: clamp(2.75rem, 13vw, 3.5rem); }
+  :root { --title-size: clamp(2.75rem, 13vw, 3.5rem); --lift: 12svh; }
   .wordmark { font-size: var(--text-md); }
   .poster-main { gap: var(--space-lg); }
   .greeting { gap: var(--space-xs); }
@@ -183,7 +186,7 @@ button { cursor: pointer; touch-action: manipulation; color: inherit; }
 @media (max-width: 40rem) and (max-height: 700px) { #privacy { display: none; } }
 /* Landscape phones: the greeting and the form side by side. */
 @media (max-height: 500px) and (min-width: 600px) {
-  :root { --title-size: 2.75rem; }
+  :root { --title-size: 2.75rem; --lift: var(--space-lg); }
   .poster, .poster-main { gap: var(--space-sm); }
   .greeting { gap: var(--space-2xs); }
   #privacy { display: none; }
